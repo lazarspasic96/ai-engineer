@@ -1,26 +1,323 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin '@tailwindcss/typography';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* --- Fonts --- */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* --- shadcn/ui color tokens --- */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* --- Design system surface colors --- */
+  --color-elevated: var(--bg-elevated);
+  --color-hover: var(--bg-hover);
+
+  /* --- Design system text colors --- */
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* --- Design system border colors --- */
+  --color-border-light: var(--border-light);
+
+  /* --- Status & brand colors --- */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-accent-brand: var(--accent-color);
+  --color-accent-light: var(--accent-light);
+
+  /* --- Diagram colors --- */
+  --color-diagram-query: var(--diagram-query);
+  --color-diagram-key: var(--diagram-key);
+  --color-diagram-value: var(--diagram-value);
+
+  /* --- Border radius --- */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  /* --- Layout spacing --- */
+  --spacing-header: var(--header-height);
+  --spacing-sidebar-left: var(--sidebar-left-width);
+  --spacing-sidebar-right: var(--sidebar-right-width);
+  --spacing-content-max: var(--content-max-width);
+  --spacing-search: var(--search-width);
+
+  /* --- Z-index scale --- */
+  --z-index-header: var(--z-header);
+  --z-index-sidebar: var(--z-sidebar);
+  --z-index-modal: var(--z-modal);
+
+  /* --- Font sizes (with line-height & letter-spacing) --- */
+  --font-size-xs: 0.75rem;
+  --font-size-xs--line-height: 1.5;
+  --font-size-sm: 0.8125rem;
+  --font-size-sm--line-height: 1.6;
+  --font-size-base: 0.875rem;
+  --font-size-base--line-height: 1.75;
+  --font-size-md: 1rem;
+  --font-size-md--line-height: 1.75;
+  --font-size-lg: 1.125rem;
+  --font-size-lg--line-height: 1.6;
+  --font-size-xl: 1.5rem;
+  --font-size-xl--line-height: 1.4;
+  --font-size-xl--letter-spacing: -0.02em;
+  --font-size-2xl: 2rem;
+  --font-size-2xl--line-height: 1.3;
+  --font-size-2xl--letter-spacing: -0.03em;
+  --font-size-3xl: 2.5rem;
+  --font-size-3xl--line-height: 1.2;
+  --font-size-3xl--letter-spacing: -0.04em;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ================================================================
+   Light mode (default)
+   ================================================================ */
+:root {
+  --radius: 0.625rem;
+
+  /* shadcn surface colors */
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #f5f5f5;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #0070f3;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #666666;
+  --accent: #ebebeb;
+  --accent-foreground: #171717;
+  --destructive: #ee0000;
+  --border: #eaeaea;
+  --input: #eaeaea;
+  --ring: #0070f3;
+
+  /* Chart colors */
+  --chart-1: #0070f3;
+  --chart-2: #7928ca;
+  --chart-3: #00a86b;
+  --chart-4: #f5a623;
+  --chart-5: #ee0000;
+
+  /* Sidebar */
+  --sidebar: #fafafa;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #0070f3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ebebeb;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #eaeaea;
+  --sidebar-ring: #0070f3;
+
+  /* Design system surfaces */
+  --bg-elevated: #fafafa;
+  --bg-hover: #ebebeb;
+
+  /* Design system text */
+  --text-secondary: #666666;
+  --text-muted: #999999;
+
+  /* Design system borders */
+  --border-light: #d4d4d4;
+
+  /* Status */
+  --success: #00a86b;
+  --warning: #f5a623;
+
+  /* Static colors (same in both modes) */
+  --accent-color: #0070f3;
+  --accent-light: #3291ff;
+  --diagram-query: #0070f3;
+  --diagram-key: #7928ca;
+  --diagram-value: #00d68f;
+
+  /* Layout dimensions */
+  --header-height: 64px;
+  --sidebar-left-width: 280px;
+  --sidebar-right-width: 240px;
+  --content-max-width: 720px;
+  --search-width: 240px;
+
+  /* Z-index */
+  --z-header: 100;
+  --z-sidebar: 50;
+  --z-modal: 200;
+}
+
+/* ================================================================
+   Dark mode
+   ================================================================ */
+.dark {
+  /* shadcn surface colors */
+  --background: #000000;
+  --foreground: #ededed;
+  --card: #111111;
+  --card-foreground: #ededed;
+  --popover: #111111;
+  --popover-foreground: #ededed;
+  --primary: #0070f3;
+  --primary-foreground: #ffffff;
+  --secondary: #111111;
+  --secondary-foreground: #ededed;
+  --muted: #111111;
+  --muted-foreground: #a1a1a1;
+  --accent: #1a1a1a;
+  --accent-foreground: #ededed;
+  --destructive: #ff3311;
+  --border: #222222;
+  --input: #222222;
+  --ring: #0070f3;
+
+  /* Chart colors */
+  --chart-1: #0070f3;
+  --chart-2: #7928ca;
+  --chart-3: #00d68f;
+  --chart-4: #f5a623;
+  --chart-5: #ff3311;
+
+  /* Sidebar */
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #ededed;
+  --sidebar-primary: #0070f3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #ededed;
+  --sidebar-border: #222222;
+  --sidebar-ring: #0070f3;
+
+  /* Design system surfaces */
+  --bg-elevated: #0a0a0a;
+  --bg-hover: #1a1a1a;
+
+  /* Design system text */
+  --text-secondary: #a1a1a1;
+  --text-muted: #666666;
+
+  /* Design system borders */
+  --border-light: #333333;
+
+  /* Status */
+  --success: #00d68f;
+}
+
+/* ================================================================
+   Base layer
+   ================================================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground text-base;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ================================================================
+   Component patterns
+   ================================================================ */
+@layer components {
+  .header-backdrop {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+  :is(.dark *).header-backdrop,
+  .dark .header-backdrop {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .hover-transition {
+    transition: all 0.15s ease;
+  }
+}
+
+/* ================================================================
+   rehype-pretty-code: dual theme support
+   ================================================================ */
+[data-rehype-pretty-code-figure] pre {
+  @apply bg-muted overflow-x-auto rounded-lg border px-4 py-3;
+}
+
+[data-rehype-pretty-code-figure] code {
+  @apply text-sm;
+  counter-reset: line;
+}
+
+[data-rehype-pretty-code-figure] [data-line] {
+  @apply px-1;
+}
+
+/* Show light theme, hide dark theme by default */
+[data-rehype-pretty-code-figure] code[data-theme*='dark'],
+[data-rehype-pretty-code-figure] code[data-theme*='dark'] span {
+  color: var(--shiki-dark) !important;
+}
+
+[data-rehype-pretty-code-figure] code[data-theme*='light'],
+[data-rehype-pretty-code-figure] code[data-theme*='light'] span {
+  color: var(--shiki-light) !important;
+}
+
+:root [data-rehype-pretty-code-figure] code[data-theme*='dark'] {
+  display: none;
+}
+
+.dark [data-rehype-pretty-code-figure] code[data-theme*='light'] {
+  display: none;
+}
+
+.dark [data-rehype-pretty-code-figure] code[data-theme*='dark'] {
+  display: block;
+}
+
+/* Inline code within prose */
+:not(pre) > code {
+  @apply bg-muted rounded px-1.5 py-0.5 text-sm font-medium;
+}
+
+/* Language label on code blocks */
+[data-rehype-pretty-code-figure] [data-language]::before {
+  content: attr(data-language);
+  @apply text-muted-foreground mb-2 block text-xs tracking-wide uppercase;
 }

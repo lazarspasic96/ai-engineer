@@ -93,3 +93,33 @@ export function getNavigation(): NavSection[] {
   sections.sort((a, b) => a.order - b.order);
   return sections;
 }
+
+export interface FlatNavItem {
+  title: string;
+  slug: string[];
+  section: string;
+}
+
+export function getFlatNavigation(): FlatNavItem[] {
+  const sections = getNavigation();
+  const flat: FlatNavItem[] = [];
+
+  for (const section of sections) {
+    for (const item of section.items) {
+      flat.push({
+        title: item.title,
+        slug: item.slug,
+        section: section.title,
+      });
+    }
+  }
+
+  return flat;
+}
+
+export function getDocContent(slug: string[]): string {
+  const filePath = path.join(CONTENT_DIR, ...slug) + '.mdx';
+  const source = fs.readFileSync(filePath, 'utf-8');
+  const { content } = matter(source);
+  return content;
+}

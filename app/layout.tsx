@@ -17,11 +17,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://ai-engineer.sh'),
+
+
   title: {
     default: 'ai-engineer.sh',
     template: '%s | ai-engineer.sh',
   },
   description: 'Learn AI engineering from the ground up',
+  openGraph: {
+    type: 'website',
+    siteName: 'ai-engineer.sh',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({

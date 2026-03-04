@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 import { codeToHtml } from 'shiki';
+
 import { CopyButton } from './copy-button';
 
 interface CodeBlockProps {
@@ -50,10 +51,7 @@ function extractCode(children: React.ReactNode): {
   return { code, language };
 }
 
-export async function CodeBlock({
-  children,
-  'data-language': dataLanguage,
-}: CodeBlockProps) {
+export async function CodeBlock({ children, 'data-language': dataLanguage }: CodeBlockProps) {
   const { code, language: parsedLang } = extractCode(children);
   const language = dataLanguage || parsedLang;
 
@@ -76,10 +74,10 @@ export async function CodeBlock({
   const label = LANGUAGE_LABELS[language] || language.toUpperCase();
 
   return (
-    <div className="code-block group relative my-6 overflow-hidden rounded-lg border border-border">
+    <div className="code-block group border-border relative my-6 overflow-hidden rounded-lg border">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-elevated px-4 py-3">
-        <span className="font-mono text-[13px] text-text-muted">{label}</span>
+      <div className="border-border bg-elevated flex items-center justify-between border-b px-4 py-3">
+        <span className="text-text-muted font-mono text-[13px]">{label}</span>
         <CopyButton code={code} />
       </div>
 

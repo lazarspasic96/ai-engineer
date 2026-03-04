@@ -161,6 +161,9 @@
   /* Design system borders */
   --border-light: #d4d4d4;
 
+  /* Code block background */
+  --code-bg: #ffffff;
+
   /* Status */
   --success: #00a86b;
   --warning: #f5a623;
@@ -237,6 +240,9 @@
   /* Design system borders */
   --border-light: #333333;
 
+  /* Code block background */
+  --code-bg: #0d1117;
+
   /* Status */
   --success: #00d68f;
 }
@@ -273,51 +279,115 @@
 }
 
 /* ================================================================
-   rehype-pretty-code: dual theme support
+   Inline code
    ================================================================ */
-[data-rehype-pretty-code-figure] pre {
-  @apply bg-muted overflow-x-auto rounded-lg border px-4 py-3;
-}
-
-[data-rehype-pretty-code-figure] code {
-  @apply text-sm;
-  counter-reset: line;
-}
-
-[data-rehype-pretty-code-figure] [data-line] {
-  @apply px-1;
-}
-
-/* Show light theme, hide dark theme by default */
-[data-rehype-pretty-code-figure] code[data-theme*='dark'],
-[data-rehype-pretty-code-figure] code[data-theme*='dark'] span {
-  color: var(--shiki-dark) !important;
-}
-
-[data-rehype-pretty-code-figure] code[data-theme*='light'],
-[data-rehype-pretty-code-figure] code[data-theme*='light'] span {
-  color: var(--shiki-light) !important;
-}
-
-:root [data-rehype-pretty-code-figure] code[data-theme*='dark'] {
-  display: none;
-}
-
-.dark [data-rehype-pretty-code-figure] code[data-theme*='light'] {
-  display: none;
-}
-
-.dark [data-rehype-pretty-code-figure] code[data-theme*='dark'] {
-  display: block;
-}
-
-/* Inline code within prose */
 :not(pre) > code {
   @apply bg-muted rounded px-1.5 py-0.5 text-sm font-medium;
 }
 
-/* Language label on code blocks */
-[data-rehype-pretty-code-figure] [data-language]::before {
-  content: attr(data-language);
-  @apply text-muted-foreground mb-2 block text-xs tracking-wide uppercase;
+/* ================================================================
+   Code block: Shiki dual-theme support
+   ================================================================ */
+.code-block-content pre {
+  @apply m-0 overflow-x-auto p-5;
+  font-family: var(--font-geist-mono), 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  tab-size: 2;
+  border-radius: 0 !important;
+}
+
+.code-block-content code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  background: transparent !important;
+}
+
+.code-block-content span {
+  font-family: inherit;
+}
+
+/*
+ * Shiki dual-theme generates:
+ *   - inline `color` = light theme (default)
+ *   - `--shiki-dark` CSS var = dark theme
+ *   - inline `background-color` = light theme bg
+ *   - `--shiki-dark-bg` CSS var = dark theme bg
+ *
+ * Light mode: inline styles are correct, just override the bg.
+ * Dark mode: swap to --shiki-dark colors.
+ */
+
+/* Light mode background */
+.code-block-content pre {
+  background-color: var(--code-bg) !important;
+}
+
+/* Dark mode: override colors with dark theme variables */
+.dark .code-block-content pre {
+  background-color: var(--code-bg) !important;
+}
+
+.dark .code-block-content .shiki,
+.dark .code-block-content .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
+.dark .code-block-content .shiki {
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* Scrollbar styling — light mode */
+.code-block-content::-webkit-scrollbar {
+  height: 8px;
+}
+
+.code-block-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-block-content::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 4px;
+}
+
+.code-block-content::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+/* Scrollbar styling — dark mode */
+.dark .code-block-content::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+
+.dark .code-block-content::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}
+
+/* ================================================================
+   Shiki transformers: notation-based highlighting
+   ================================================================ */
+.shiki-transformers code .highlighted {
+  @apply -mx-4 border-l-2 border-blue-500 bg-blue-500/10 px-[calc(1rem-2px)];
+}
+
+.shiki-transformers code .diff.add {
+  @apply -mx-4 border-l-2 border-green-500 bg-green-500/10 px-[calc(1rem-2px)];
+}
+
+.shiki-transformers code .diff.remove {
+  @apply -mx-4 border-l-2 border-red-500 bg-red-500/10 px-[calc(1rem-2px)];
+}
+
+.shiki-transformers code .focused {
+  @apply -mx-4 bg-yellow-500/10 px-4;
+}
+
+.shiki-transformers code:has(.focused) .line:not(.focused) {
+  @apply opacity-40 transition-opacity;
+}
+
+.shiki-transformers code .highlighted-word {
+  @apply rounded bg-blue-500/20 px-1 py-0.5;
 }

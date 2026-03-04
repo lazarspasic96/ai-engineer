@@ -1,8 +1,6 @@
-'use client';
-
-import { useRef, useState } from 'react';
-import { Check, Copy } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { type ReactElement } from 'react';
+import { codeToHtml } from 'shiki';
+import { CopyButton } from './copy-button';
 
 interface CodeBlockProps {
   children: React.ReactNode;
@@ -10,42 +8,86 @@ interface CodeBlockProps {
   'data-language'?: string;
 }
 
-export function CodeBlock({
-  children,
-  className,
-  'data-language': language,
-  ...props
-}: CodeBlockProps) {
-  const preRef = useRef<HTMLPreElement>(null);
-  const [copied, setCopied] = useState(false);
+const LANGUAGE_LABELS: Record<string, string> = {
+  typescript: 'TypeScript',
+  ts: 'TypeScript',
+  javascript: 'JavaScript',
+  js: 'JavaScript',
+  tsx: 'TSX',
+  jsx: 'JSX',
+  python: 'Python',
+  py: 'Python',
+  bash: 'Bash',
+  sh: 'Bash',
+  shell: 'Shell',
+  json: 'JSON',
+  yaml: 'YAML',
+  yml: 'YAML',
+  css: 'CSS',
+  html: 'HTML',
+  sql: 'SQL',
+  markdown: 'Markdown',
+  md: 'Markdown',
+  text: 'Plain Text',
+  plaintext: 'Plain Text',
+};
 
-  const handleCopy = async () => {
-    const text = preRef.current?.textContent ?? '';
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+function extractCode(children: React.ReactNode): {
+  code: string;
+  language: string;
+} {
+  const codeElement = children as ReactElement<{
+    className?: string;
+    children?: React.ReactNode;
+  }>;
+
+  const className = codeElement?.props?.className || '';
+  const language = className.replace('language-', '') || 'text';
+
+  const raw = codeElement?.props?.children;
+  const code = typeof raw === 'string' ? raw.trim() : '';
+
+  return { code, language };
+}
+
+export async function CodeBlock({
+  children,
+  'data-language': dataLanguage,
+}: CodeBlockProps) {
+  const { code, language: parsedLang } = extractCode(children);
+  const language = dataLanguage || parsedLang;
+
+  if (!code) {
+    return (
+      <pre>
+        <code>{children}</code>
+      </pre>
+    );
+  }
+
+  const html = await codeToHtml(code, {
+    lang: language === 'text' || language === 'plaintext' ? 'text' : language,
+    themes: {
+      light: 'github-light',
+      dark: 'github-dark',
+    },
+  });
+
+  const label = LANGUAGE_LABELS[language] || language.toUpperCase();
 
   return (
-    <div className="group relative">
-      {language && (
-        <div className="text-muted-foreground absolute top-2 left-4 text-xs tracking-wide uppercase">
-          {language}
-        </div>
-      )}
-      <button
-        onClick={handleCopy}
-        className={cn(
-          'bg-background text-muted-foreground hover:text-foreground absolute top-2 right-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-md border opacity-0 transition-opacity group-hover:opacity-100',
-          copied && 'text-green-500'
-        )}
-        aria-label="Copy code"
-      >
-        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-      </button>
-      <pre ref={preRef} className={className} {...props}>
-        {children}
-      </pre>
+    <div className="code-block group relative my-6 overflow-hidden rounded-lg border border-border">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-border bg-elevated px-4 py-3">
+        <span className="font-mono text-[13px] text-text-muted">{label}</span>
+        <CopyButton code={code} />
+      </div>
+
+      {/* Highlighted code */}
+      <div
+        className="code-block-content overflow-x-auto"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

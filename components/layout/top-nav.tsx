@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { BookOpen, Github } from 'lucide-react';
+import { AlignJustify, Github } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { MobileNav } from '@/components/layout/mobile-nav';
+import { SearchProvider } from '@/components/search/search-data';
 import type { NavSection } from '@/lib/content';
 
 interface TopNavProps {
@@ -18,7 +19,9 @@ export function TopNav({ navigation }: TopNavProps) {
           href="/docs/getting-started/introduction"
           className="mr-6 flex items-center gap-2 font-semibold"
         >
-          <BookOpen className="h-5 w-5" />
+          <span className="flex h-7 w-7 items-center justify-center rounded-sm bg-blue-600">
+            <AlignJustify className="h-4 w-4 text-white" strokeWidth={2.5} />
+          </span>
           <span>ai-engineer.sh</span>
         </Link>
 
@@ -32,6 +35,7 @@ export function TopNav({ navigation }: TopNavProps) {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <SearchProvider />
           <ThemeToggle />
           <a
             href="https://github.com/lazarspasic/ai-engineer"

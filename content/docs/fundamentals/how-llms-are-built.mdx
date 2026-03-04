@@ -1,0 +1,158 @@
+---
+title: How LLMs Are Built
+description: The complete pipeline from internet data to a working language model.
+order: 4
+---
+
+import { Screenshot } from '@/components/mdx/screenshot'
+
+# How LLMs Are Built
+
+Large language models are AI systems that can understand and generate text. Despite their seemingly magical capabilities, these models don't think, reason, or understand like humans. They are sophisticated pattern-matching systems that have learned the statistical structure of human language by processing billions of examples.
+
+An LLM is a language model trained via self-supervised machine learning on enormous amounts of text, designed for natural language processing tasks — especially text generation. The largest and most capable LLMs are generative pre-trained transformers (GPTs), and they form the foundation of modern chatbots.
+
+## What is an LLM
+
+At its core, a language model is a mathematical system that has learned how language "works" and can predict or generate text that makes sense. Think of it as autocomplete at scale — your phone predicts the next 1–2 words, while an LLM predicts entire paragraphs, answers questions, writes code, and translates between languages.
+
+| Provider | Model | Website |
+|----------|-------|---------|
+| OpenAI | ChatGPT | chatgpt.com |
+| Anthropic | Claude | claude.ai |
+| Google | Gemini | gemini.google.com |
+| xAI | Grok | grok.com |
+| Meta | Meta AI | meta.ai |
+
+### Self-supervised learning
+
+"Self-supervised" means the model creates its own training tasks from the data, without humans manually labeling anything. The model reads millions of texts and tests itself: given a sentence with the last word hidden, can it predict what comes next?
+
+```python
+# Conceptual example of self-supervised training
+input_text  = "I love machine ____"
+
+# Model predicts probabilities:
+# "learning" → 75%
+# "guns"     → 2%
+# "banana"   → 0.001%
+
+# Original text says "learning"
+# ✓ Correct — model improves slightly
+```
+
+The model repeats this process billions of times across billions of documents until it develops a deep statistical understanding of language.
+
+## Pre-training and post-training
+
+Building an LLM always involves two phases: **pre-training** and **post-training**.
+
+<Screenshot
+  src="/images/docs/fundamentals/placeholder-training-pipeline.png"
+  alt="Two-phase LLM training pipeline: pre-training on internet data produces a base model, then post-training produces the final model"
+  caption="LLM training happens in two phases with very different resource requirements."
+/>
+
+| | Pre-training | Post-training |
+|---|---|---|
+| **Input** | Internet-scale text data | Curated instruction/feedback data |
+| **Output** | Base model | Final model (ChatGPT, Claude, etc.) |
+| **GPUs** | Thousands | Hundreds |
+| **Duration** | Months | Days |
+| **Cost** | $$$$$ | $ |
+
+**Pre-training** is where the heavy lifting happens. The model trains on internet-scale data, processing billions of tokens across thousands of GPUs over months. The result is a base model with strong language understanding but no conversational ability.
+
+**Post-training** turns the base model into the assistant you interact with. Through techniques like instruction tuning and reinforcement learning from human feedback (RLHF), the model learns to follow instructions, refuse harmful requests, and produce helpful responses. This phase is shorter, cheaper, and requires far fewer resources.
+
+## Data collection
+
+The first step of pre-training is gathering text from the internet. Web crawling is the automated process of programs systematically visiting web pages, downloading their content, and following links to discover more pages.
+
+<Screenshot
+  src="/images/docs/fundamentals/placeholder-crawling.png"
+  alt="Web crawling pipeline: URLs go into a web crawler which outputs HTML text content"
+  caption="Web crawlers systematically download and extract text from web pages."
+/>
+
+There are two approaches to data collection:
+
+- **Crawl yourself** — companies like OpenAI and Anthropic run their own crawling infrastructure
+- **Use public datasets** — leverage data that others have already crawled and published
+
+The best-known public source is **CommonCrawl**, a non-profit organization that has been crawling the web since 2007. It maintains an archive of approximately 2.7 billion web pages (200–400 TB of HTML text content) and releases a new crawl roughly every two months.
+
+## Data cleaning
+
+Raw web data is noisy. It contains duplicates, low-quality content, toxic material, and personal information. Cleaning is critical because it's much harder to make a model forget something than to teach it something new.
+
+> "We prioritized filtering out all bad data rather than retaining all good data... we can always fine-tune our model with more data later, but it is much harder to make a model forget something it has already learned." — OpenAI
+
+<Screenshot
+  src="/images/docs/fundamentals/placeholder-cleaning-pipeline.png"
+  alt="Data cleaning pipeline from raw internet data through text extraction, language ID, URL filtering, deduplication, quality filters, toxicity filters, and PII redaction to a clean dataset"
+  caption="The data cleaning pipeline transforms raw web data into training-ready text."
+/>
+
+The cleaning pipeline typically includes these stages:
+
+| Stage | Purpose | Method |
+|-------|---------|--------|
+| Deduplication | Remove duplicate/redundant text | MinHash, exact matching |
+| Quality filtering | Remove low-quality content | Heuristics + classifiers |
+| Toxicity filtering | Remove hate speech, violence, misinformation, NSFW, spam | Content classifiers |
+| PII redaction | Anonymize personal data | Pattern matching, NER |
+| Text normalization | Standardize formats | Rule-based transforms |
+
+**Deduplication** is particularly important. The same news article, definition, or code snippet can appear across dozens of sites. If the model sees the same text repeatedly, it learns to memorize rather than generalize. This can cause the "double descent" phenomenon and degrade the model's ability to copy from context.
+
+Several organizations publish cleaned datasets ready for training:
+
+| Dataset | Source | Size |
+|---------|--------|------|
+| C4 | Google | 750 GB |
+| Dolma | AI2 | 3 TB |
+| RefinedWeb | Falcon/TII | 5 TB |
+| FineWeb | HuggingFace | 44 TB (15T tokens) |
+
+Most LLMs used C4 as a starting point. FineWeb is the most recent, published by HuggingFace as a fully open-source dataset.
+
+## From text to numbers
+
+LLMs don't accept text as input — they need numbers. **Tokenization** converts raw text into a sequence of discrete numbers that the model can process.
+
+A token is not the same as a word. Depending on the tokenizer, a token can represent a single character, a subword, a complete word, punctuation, or whitespace. LLMs typically use vocabularies of 30,000–100,000 tokens. By breaking rare or complex words into subword pieces (e.g., "extraordinary" → "extra" + "ordinary"), a limited vocabulary can express unlimited language.
+
+The full pipeline from text to model input:
+
+```
+Text: "Hello world"
+  ↓ Tokenization
+Tokens: ["Hello", " world"]
+  ↓ Token IDs
+IDs: [15496, 995]
+  ↓ Embedding layer
+Vectors: [[0.23, -0.45, 0.78, ...], [0.12, 0.89, -0.34, ...]]
+  ↓ Transformer
+Neural network processes the numerical vectors
+```
+
+Each company uses its own tokenization algorithm. The efficiency of these algorithms directly impacts the model's context capacity and output quality.
+
+The most common subword algorithm is Byte-Pair Encoding (BPE), which iteratively merges the most frequent pairs of adjacent tokens until the vocabulary reaches a target size.
+
+## Context window
+
+LLMs have a limited **context window** — the maximum number of tokens they can process at once. This limit affects:
+
+- **Input length** — how much text the model can consider before generating a response
+- **Output length** — how much it can generate in a single completion
+- **Coherence** — how well it maintains consistency across longer conversations or documents
+
+### Tokenization edge cases
+
+Tokenization can produce unexpected behavior in practice:
+
+- **Non-English languages** — tokenizers are primarily trained on English text, so non-English words often require more tokens. The English word "unhappiness" might tokenize to 2 tokens, while its equivalent in another language could require 5+
+- **Special characters** — emoji and unusual formatting can consume more tokens than expected
+- **Numbers and code** — some tokenizers fragment numbers and programming constructs in counter-intuitive ways, making arithmetic and code generation harder

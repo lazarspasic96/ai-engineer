@@ -16,6 +16,12 @@ An LLM is a language model trained via self-supervised machine learning on enorm
 
 At its core, a language model is a mathematical system that has learned how language "works" and can predict or generate text that makes sense. Think of it as autocomplete at scale — your phone predicts the next 1–2 words, while an LLM predicts entire paragraphs, answers questions, writes code, and translates between languages.
 
+<Screenshot
+  src="/images/docs/fundamentals/llm-providers.png"
+  alt="The major LLM providers and their chat products: ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), Grok (xAI), and Meta AI (Meta)"
+  caption="The major providers each expose their LLMs through a chat product."
+/>
+
 | Provider | Model | Website |
 |----------|-------|---------|
 | OpenAI | ChatGPT | chatgpt.com |
@@ -48,7 +54,7 @@ The model repeats this process billions of times across billions of documents un
 Building an LLM always involves two phases: **pre-training** and **post-training**.
 
 <Screenshot
-  src="/images/docs/fundamentals/placeholder-training-pipeline.png"
+  src="/images/docs/fundamentals/training-pipeline.png"
   alt="Two-phase LLM training pipeline: pre-training on internet data produces a base model, then post-training produces the final model"
   caption="LLM training happens in two phases with very different resource requirements."
 />
@@ -70,7 +76,7 @@ Building an LLM always involves two phases: **pre-training** and **post-training
 The first step of pre-training is gathering text from the internet. Web crawling is the automated process of programs systematically visiting web pages, downloading their content, and following links to discover more pages.
 
 <Screenshot
-  src="/images/docs/fundamentals/placeholder-crawling.png"
+  src="/images/docs/fundamentals/crawling.png"
   alt="Web crawling pipeline: URLs go into a web crawler which outputs HTML text content"
   caption="Web crawlers systematically download and extract text from web pages."
 />
@@ -89,9 +95,9 @@ Raw web data is noisy. It contains duplicates, low-quality content, toxic materi
 > "We prioritized filtering out all bad data rather than retaining all good data... we can always fine-tune our model with more data later, but it is much harder to make a model forget something it has already learned." — OpenAI
 
 <Screenshot
-  src="/images/docs/fundamentals/placeholder-cleaning-pipeline.png"
-  alt="Data cleaning pipeline from raw internet data through text extraction, language ID, URL filtering, deduplication, quality filters, toxicity filters, and PII redaction to a clean dataset"
-  caption="The data cleaning pipeline transforms raw web data into training-ready text."
+  src="/images/docs/fundamentals/data-cleaning-pipeline.png"
+  alt="The FineWeb cleaning pipeline: URL filtering, text extraction, language filtering, Gopher filtering, MinHash deduplication, C4 filters, custom filters, and PII removal — alongside the major public datasets C4, Dolma, RefinedWeb, and FineWeb"
+  caption="The FineWeb pipeline transforms raw web data into a training-ready dataset."
 />
 
 The cleaning pipeline typically includes these stages:
@@ -105,6 +111,8 @@ The cleaning pipeline typically includes these stages:
 | Text normalization | Standardize formats | Rule-based transforms |
 
 **Deduplication** is particularly important. The same news article, definition, or code snippet can appear across dozens of sites. If the model sees the same text repeatedly, it learns to memorize rather than generalize. This can cause the "double descent" phenomenon and degrade the model's ability to copy from context.
+
+Some sources also need structural decisions, not just filtering. Reddit, for example, is a tree of posts and comments — you have to decide how to flatten that comment tree so the model learns the logical flow of a discussion, and filter out NSFW subreddits. Reddit data is valuable enough that access to it has become contested: in June 2025, Reddit sued Anthropic for allegedly scraping its content to train Claude, a claim Anthropic disputes.
 
 Several organizations publish cleaned datasets ready for training:
 
@@ -156,3 +164,7 @@ Tokenization can produce unexpected behavior in practice:
 - **Non-English languages** — tokenizers are primarily trained on English text, so non-English words often require more tokens. The English word "unhappiness" might tokenize to 2 tokens, while its equivalent in another language could require 5+
 - **Special characters** — emoji and unusual formatting can consume more tokens than expected
 - **Numbers and code** — some tokenizers fragment numbers and programming constructs in counter-intuitive ways, making arithmetic and code generation harder
+
+---
+
+Next: [Tokenization](/docs/fundamentals/tokenization) — a deeper look at how text becomes tokens, why it matters, and where it breaks down.

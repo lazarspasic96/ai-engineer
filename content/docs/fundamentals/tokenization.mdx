@@ -1,0 +1,144 @@
+---
+title: Tokenization
+description: How LLMs turn raw text into the discrete numbers they actually process — what a token is, why tokenization matters, and where it breaks down.
+order: 5
+---
+
+import { Screenshot } from '@/components/mdx/screenshot'
+
+# Tokenization
+
+LLMs don't read text. They read numbers. Before a model can process a single word, that word has to be converted into a sequence of integers — and the step that does this is **tokenization**.
+
+<Screenshot
+  src="/images/docs/fundamentals/tokenization.png"
+  alt="Tokenization converts raw text on the left into a long sequence of discrete numbers on the right"
+  caption="Tokenization turns raw text into a long sequence of discrete numbers the model can process."
+/>
+
+Tokenization follows a specific algorithm — a fixed set of rules that splits text into units called tokens and maps each one to a number. It's the bridge between human-readable text and the numerical input a neural network expects.
+
+## What is a token
+
+A token is the fundamental unit of text an LLM processes. You send tokens to the model, you're billed per token, and the model reads, predicts, and generates in tokens — not words.
+
+A token is **not** the same as a word. When you type `Hello world!` into ChatGPT, it doesn't see two words and a punctuation mark. It sees four distinct tokens:
+
+```text
+"Hello world!"  →  ["Hello", " world", "!", "\n"]
+```
+
+Note that the space and the trailing newline are part of the tokens — tokenizers preserve whitespace because it carries meaning.
+
+Depending on the tokenizer, a single token can represent:
+
+- a single character
+- a subword (part of a word)
+- a complete word
+- a punctuation mark
+- a whitespace or special character
+
+A useful mental model is LEGO. The model never sees whole sentences as words — it sees a set of reusable bricks it can snap together:
+
+```text
+"I love machine learning!"
+ ↓
+[I] [ love] [ machine] [ learn] [ing] [!]
+```
+
+The word "learning" gets split into `learn` + `ing` — two reusable bricks the model can recombine into "learned", "learner", or "burning".
+
+## Token ≠ word
+
+Because tokens are subword pieces, the token count of a text rarely matches its word count. This is the whole point: LLMs have **limited vocabularies** — typically 30,000 to 100,000 tokens. A fixed vocabulary of that size cannot contain every word in every language, so tokenizers break rare or complex words into smaller, reusable pieces:
+
+```text
+"extraordinary"  →  "extra" + "ordinary"
+```
+
+By composing subwords, a limited vocabulary can express an unlimited space of words. The most common algorithm for learning these pieces is **Byte-Pair Encoding (BPE)**, which starts from individual characters and repeatedly merges the most frequent adjacent pair until the vocabulary reaches its target size.
+
+## Why tokenization matters
+
+Tokenization isn't just plumbing — its quality shapes how well and how cheaply a model works.
+
+| Reason | Why it matters |
+|--------|----------------|
+| **Vocabulary management** | A 30K–100K vocabulary must cover unlimited language. Subword splitting makes that possible. |
+| **Handling unknown words** | A word the model never saw — like "biocatalyst" — can still be understood as `bio` + `catalyst`, two known pieces. |
+| **Efficiency** | Sequence length drives compute cost. Fewer tokens per text means cheaper, faster processing. |
+| **Model performance** | Poor tokenization hurts comprehension and generation — especially for non-English text and specialized domains. |
+
+## From tokens to numbers
+
+Splitting text into tokens is only half the job. Each token still has to become a number the network can do math on.
+
+Every token in the vocabulary is assigned a unique integer — its **token ID**:
+
+```text
+"Hello"   →  token ID 15496
+" world"  →  token ID 995
+```
+
+Those IDs are then converted into **embeddings**: dense vectors of real numbers, typically 512, 1024, or more dimensions. The embedding for "Hello" might look like `[0.23, -0.45, 0.78, ...]`. Embeddings are what let the model represent meaning — similar tokens end up with similar vectors.
+
+The full pipeline from text to model input:
+
+```text
+Text:        "Hello world"
+  ↓ Tokenization
+Tokens:      ["Hello", " world"]
+  ↓ Token IDs
+IDs:         [15496, 995]
+  ↓ Embedding layer
+Vectors:     [[0.23, -0.45, 0.78, ...], [0.12, 0.89, -0.34, ...]]
+  ↓ Transformer
+Neural network processes the numerical vectors
+```
+
+Every company uses its own tokenization algorithm, and its efficiency directly affects both the model's context capacity and the quality of its output.
+
+## Context window
+
+Because the model works in tokens, its limits are measured in tokens too. The **context window** is the maximum number of tokens a model can process at once. It affects:
+
+- **Input length** — how much text the model can consider before responding
+- **Output length** — how much it can generate in a single completion
+- **Coherence** — how well it stays consistent across long conversations or documents
+
+More efficient tokenization means more real content fits inside the same context window.
+
+## Where tokenization breaks down
+
+Tokenization causes several counter-intuitive behaviors in practice.
+
+### Non-English languages
+
+Tokenizers are trained mostly on English text, simply because the internet is dominated by English. So they learned to tokenize English efficiently — and everything else less so.
+
+Imagine a 50,000-word dictionary built that way:
+
+- ~40,000 English words
+- ~5,000 words for one other language
+- ~5,000 for every remaining language combined
+
+The effect shows up directly in token counts. An English word the tokenizer knows well splits into few pieces, while an equivalent word in another language gets shattered into many:
+
+```text
+"unhappiness"  →  ["un", "happiness"]        = 2 tokens
+"nesreća"      →  ["n", "es", "re", "ć", "a"] = 5 tokens
+```
+
+Same meaning, more than double the tokens — which means non-English users pay more and fit less into the context window. (Exact splits depend on the tokenizer; these are illustrative.)
+
+### Special characters
+
+Emoji and unusual formatting can consume far more tokens than expected. A single emoji like 🧠 may take several tokens depending on the tokenizer, quietly inflating token usage.
+
+### Numbers and code
+
+Some tokenizers fragment numbers and programming constructs in odd ways, splitting them across multiple tokens. This is a big reason LLMs struggle with arithmetic and exact code generation — they see fragmented symbols, not clean numbers.
+
+---
+
+For how tokens fit into the bigger picture of building a model, see [How LLMs Are Built](/docs/fundamentals/how-llms-are-built).

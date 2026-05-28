@@ -1,6 +1,6 @@
 ---
 name: structure-learning
-description: Structures raw learning notes, pasted text, exported documents (.docx / Google Docs), or external sources into a docs article for this MDX docs site, fact-checking every claim and placing it in the right section. Ingests .docx files with Pandoc to extract embedded images as real files. Use when the user shares something they learned (notes, an article, a transcript, a link, a code snippet, a .docx/Google Doc) and wants it cleaned up, verified, and added to the documentation, or says "structure this", "add this to the docs", "I learned X", or "here's a new source".
+description: Structures raw learning notes, pasted text, exported documents (.docx / Google Docs), or external sources into a docs article for this MDX docs site, fact-checking every claim and placing it in the right section. Topics span the whole AI stack — LLM fundamentals, transformers, prompting, Claude, Codex, agents, RAG, second brain, evals, tooling — and content arrives non-linearly, so the skill always maps the full docs tree before placing and proposes new sections when needed. Ingests .docx files with Pandoc to extract embedded images as real files. Use when the user shares something they learned (notes, an article, a transcript, a link, a code snippet, a .docx/Google Doc) and wants it cleaned up, verified, and added to the documentation, or says "structure this", "add this to the docs", "I learned X", or "here's a new source".
 ---
 
 # Structure Learning Into Docs
@@ -32,25 +32,40 @@ This prints the path to the generated Markdown and lists every extracted image (
 
 If the user instead hands you a Google **native Markdown (.md)** export with `data:image/...;base64` links, warn them: those images are broken — ask them to re-export as `.docx` and run this step.
 
+**Pandoc artifacts to clean up before reading the source:**
+- `[CODE_BLOCK]` / `[CODE_BLOCK: name]` placeholders appear for Google Docs code blocks — treat the wrapped content as a fenced code block (pick the language from context).
+- Mixed-language sources are common (e.g. Serbian intro + English body). Note which sections are in which language so you can translate them in step 4.
+
 ### 1. Verify every factual claim
 
 Go through the source sentence by sentence. For every factual, technical, numeric, or API claim:
 
 - Confirm it with **web search** and **official docs** (use context7 for any library/framework/SDK/API — even well-known ones; prefer it over memory).
 - Record the source URL for each verified claim.
+- **Verify quotes and attributions, not just facts.** When the source paraphrases an author, book, or article (e.g. "Ousterhout says..."), fetch the actual thesis. A paraphrase that *sounds right* often isn't — surface the gap and propose the correct framing.
+- **Distinguish heuristics from measurements.** Round numbers like "60–80% of the context window" are almost always community rules of thumb. Frame them as heuristics, cite the research that motivates them, and don't present them as measurements.
 - Flag anything you **cannot** verify, anything contradicted by sources, and anything ambiguous — do not silently "fix" or invent. Bring these to the user as questions.
 
-### 2. Determine placement
+### 2. Map the docs, then place
 
-- Map the content to an existing section in `SECTION_ORDER`.
-- Pick a kebab-case `slug` and the next free `order` within that section (read existing files' frontmatter to find it).
-- If nothing fits: draft a proposed new section (title + where in the order it goes). Do **not** edit `lib/content.ts` yet.
+Don't pick placement from keywords. Build the full map first, then decide.
+
+- **Read the whole tree.** List every section in `SECTION_ORDER` and every article under `content/docs/`. Skim titles and frontmatter so you know what the docs already cover. Do this even if you remember it from a previous run — the tree changes.
+- **Derive the topic from the content, not the filename.** A file named `AI Basics.docx` may actually be about AI-assisted engineering practices. Read first, classify after.
+- **One source often contains multiple articles.** If a single doc covers several distinct domains (e.g. PRDs *and* software entropy *and* git hooks), split it. Each output article should have one focused topic.
+- **Place by domain, not by what's next.** The user learns non-linearly: Claude one week, RAG the next, Codex after that, second brain later. New content rarely lands in a tidy progression. First ask "what domain does this belong to?" — then ask "what's the next slug/order?"
+- **Be willing to add a new section.** If the content opens a new area (e.g. Agents, RAG, Prompting, Tooling, Claude, Codex, Second Brain, Evals), draft a new section instead of forcing it into an existing one. Do **not** edit `lib/content.ts` yet — wait for approval.
+- **Cross-link aggressively.** Identify 2–5 related articles in other sections to link from the new article (and consider adding back-links from those articles). Cross-links are how non-linear learning becomes a navigable graph.
+- **Watch for overlaps with existing articles.** If the new source mostly duplicates an existing article, flag it. Possible outcomes: merge new bits into the existing article, split the genuinely-new material into a deeper companion article, or skip. Bring this to the user — never silently duplicate.
+- **Pick the slug + order.** Kebab-case slug; next free `order` in the chosen section (read existing files' frontmatter to find it).
 
 ### 3. Present the plan and STOP
 
 Use `AskUserQuestion`. Surface, concisely:
 
 - **Placement** — section / slug / order (and new-section proposal if any).
+- **Overlap** — any existing article this duplicates, and the proposed split (merge / new companion / skip).
+- **Cross-links** — 2–5 related articles in other sections to link to/from.
 - **Open questions** — every unverifiable claim, contradiction, ambiguity, or gap. Ask, don't guess.
 - **Fact-check findings** — claims that were wrong/outdated and your proposed correction (with source).
 - **Image suggestions** — where a diagram would help (see step 5).
@@ -62,6 +77,7 @@ Wait for answers and explicit approval before writing.
 Only after approval. Create `content/docs/<section>/<slug>.mdx` following `CONTENT-GUIDE.md`:
 
 - Frontmatter: `title`, `description`, `order`.
+- **Write in the docs' language.** Match the language of existing articles (currently English) — translate non-matching sections from the source instead of pasting them through.
 - Restructure into `##`/`###` sections (they feed the TOC); rewrite for clarity while preserving the user's intent.
 - Add runnable, minimal code examples in fenced blocks with the right language.
 - Use tables for comparisons; blockquotes for tips/quotes.

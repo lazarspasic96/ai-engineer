@@ -131,6 +131,26 @@ The effect shows up directly in token counts. An English word the tokenizer know
 
 Same meaning, more than double the tokens — which means non-English users pay more and fit less into the context window. (Exact splits depend on the tokenizer; these are illustrative.)
 
+#### How much more, exactly
+
+The gap isn't trivial — peer-reviewed studies have measured it across dozens of languages. The ratios cluster by writing system:
+
+| Language family | Tokens vs the same meaning in English | Practical cost multiplier |
+|---|---|---|
+| English / Latin (baseline) | 1× | 1× |
+| Cyrillic (Serbian, Russian, Ukrainian, …) | 2–3× | ~2–3× |
+| Chinese / Japanese / Korean (CJK) | ~1 token per character vs ~4 chars/token in English | ~4–5× |
+| Other non-Latin / morphologically complex (Hindi, Arabic, Hebrew, …) | 3–5× | 3–5× |
+
+Two technical reasons compound:
+
+- **BPE was trained on mostly English text.** Byte-Pair Encoding learns merges from frequency in the training corpus. Non-Latin characters didn't appear often enough during BPE training to form many merges, so they stay split into small pieces.
+- **UTF-8 encoding penalty.** Latin characters are 1 byte each, but Cyrillic, CJK, and many other scripts encode as 2–3 bytes per character. Even before tokenization there's a byte-level overhead the merges can't fully recover.
+
+The implication is direct: **the smart zone of your context window shrinks proportionally to your tokenization cost**. A 200K-token window holding ~150K English tokens of usable context holds only ~50K–75K equivalent Chinese tokens, and ~60K–100K Cyrillic ones. This is also why writing docs, commit messages, and code comments in English isn't just a style choice — it's a 2–5× efficiency multiplier for any agent reading the repo.
+
+The arXiv paper [*Language Model Tokenizers Introduce Unfairness Between Languages*](https://arxiv.org/abs/2305.15425) frames this as a structural inequity, not an implementation bug. Speakers of underrepresented languages pay more for the same task — both in dollars and in effective context.
+
 ### Special characters
 
 Emoji and unusual formatting can consume far more tokens than expected. A single emoji like 🧠 may take several tokens depending on the tokenizer, quietly inflating token usage.
@@ -142,3 +162,11 @@ Some tokenizers fragment numbers and programming constructs in odd ways, splitti
 ---
 
 For how tokens fit into the bigger picture of building a model, see [How LLMs Are Built](/docs/fundamentals/how-llms-are-built).
+
+## Sources
+
+- Petrov, Malkin et al. — [*Language Model Tokenizers Introduce Unfairness Between Languages*](https://arxiv.org/abs/2305.15425). Peer-reviewed cross-language tokenization study (arXiv 2305.15425).
+- [*Tokenization Disparities as Infrastructure Bias: How Subword Systems Create Inequities in LLM Access and Efficiency*](https://arxiv.org/abs/2510.12389) — follow-up study quantifying 3–5× cost ratios for non-Latin and morphologically complex languages (arXiv 2510.12389).
+- ByteByteGo — [*How LLMs See the World*](https://blog.bytebytego.com/p/how-llms-see-the-world). Explains why `Hello world!` tokenizes to four tokens and how token IDs and embeddings connect.
+- PromptCost — [*LLM Tokenization Explained: English vs Other Languages Cost Difference*](https://promptcost.org/blog/llm-tokenization-explained/). Practical breakdown of the cost gap by script.
+- OpenAI Developer Community — [*Token size in Russian lang*](https://community.openai.com/t/token-size-in-russian-lang/30767). Reproducible measurements of Cyrillic vs Latin token ratios in OpenAI tokenizers.

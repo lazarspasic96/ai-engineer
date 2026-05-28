@@ -1,0 +1,177 @@
+---
+title: Software Quality in the AI Era
+description: Why "code is cheap" is misleading, what software entropy actually is, and why AI agents are more sensitive to codebase quality than human engineers.
+order: 2
+---
+
+# Software Quality in the AI Era
+
+There's a growing narrative that code has become cheap because AI can generate it in seconds. Components, APIs, tests, infrastructure — all of it spins up faster than it would have a few years ago. But that produces a dangerous misconception:
+
+> Faster code generation does not automatically produce better software systems.
+
+In many cases, AI accelerates one of the oldest problems in software engineering: **software entropy**. In the AI era, software quality matters more, not less.
+
+## What software quality actually is
+
+"Software quality" is often confused with surface qualities — clean syntax, modern frameworks, formatted code, passing tests. None of those are wrong, but they aren't the definition.
+
+A more useful lens comes from John Ousterhout's *A Philosophy of Software Design*: **good design is about managing complexity**. Ousterhout defines complexity as *anything related to the structure of a system that makes it hard to understand and modify*, and he identifies two root causes: **dependencies** and **obscurity**. Complexity shows up as:
+
+- **Change amplification** — a small change requires touching many places
+- **Cognitive load** — engineers need to hold too much in their head
+- **Unknown unknowns** — the parts that will break aren't even visible
+
+The operational consequence is simple: a high-quality system is one that's **easy to change safely**. Related concepts are grouped together, components have clear responsibilities, modifications are localized, and feedback loops surface mistakes quickly.
+
+In practice, that means engineers can:
+
+- ship features faster without breaking adjacent ones
+- debug with confidence
+- onboard new contributors without weeks of tribal knowledge transfer
+- evolve the product without constant regression fear
+
+Once a system loses that property, every future modification becomes more expensive — and that cost compounds.
+
+## Software entropy
+
+Software naturally degrades over time. The phenomenon is called **software entropy**, and *The Pragmatic Programmer* popularized the framing.
+
+Entropy isn't a sign of incompetent engineers. It's the residue of constant pressure: deadlines, incidents, shifting requirements, fatigue. Under pressure, teams optimize for *delivering now* — adding quick fixes, temporary abstractions, duplicated logic, conditional complexity, architectural shortcuts. Each decision looks harmless in isolation. Collectively they turn a clean system into a fragile one.
+
+This is why mature systems "feel heavy":
+
+- Small changes require touching many files
+- Regressions appear in places that look unrelated
+- Engineers get afraid to modify critical areas
+- Velocity quietly slows down
+
+Entropy is cumulative. Without deliberate counter-pressure, software tends toward disorder.
+
+## Most commits improve features while damaging architecture
+
+A sharp observation: the vast majority of commits in any project **add functionality or patch bugs**. Very few commits simplify architecture, reduce coupling, or improve abstractions.
+
+That asymmetry is the engine of entropy. Feature work continuously raises complexity; maintainability work happens only occasionally. Over years, a project ships externally while degrading internally — slower delivery, larger PRs, more bugs, harder onboarding.
+
+| Most commits do this | Few commits do this |
+|---|---|
+| Add features | Simplify architecture |
+| Patch bugs | Improve abstractions |
+| Meet immediate requirements | Reduce coupling |
+| | Strengthen testing |
+| | Improve developer ergonomics |
+
+## Refactoring is the counter-pressure
+
+Refactoring is not cosmetic. It's the primary mechanism for resisting entropy. Done well, it:
+
+- Simplifies the next change
+- Improves clarity
+- Reduces accidental complexity
+- Restores architectural integrity
+
+A single well-targeted refactor can save hundreds of engineering hours downstream. In AI-assisted environments this matters more, not less — because AI agents depend on structural clarity to do good work.
+
+## AI changes the *speed* of entropy
+
+AI dramatically accelerates code production. That's its strength. It's also its risk.
+
+AI is excellent at:
+
+- Generating boilerplate
+- Replicating existing patterns
+- Implementing repetitive logic
+- Scaffolding new modules
+
+But the hard problems in software engineering aren't generation. They're:
+
+- System design
+- Architectural tradeoffs
+- Conceptual modeling
+- Abstraction boundaries
+- Long-term maintainability
+
+These remain weak spots for AI. So the result is:
+
+> AI increases the rate of software entropy unless the surrounding system is designed to resist it.
+
+If poor patterns already exist in the codebase, AI will replicate them at scale. The fastest path to a catastrophically tangled codebase is now an AI agent working enthusiastically inside an already-tangled one.
+
+## The codebase is the real prompt
+
+Many engineers assume AI behavior is controlled mostly through prompts, instructions, or rules files. In practice, the strongest influence on AI-generated code is the **existing codebase itself**.
+
+The agent treats the repository as the source of truth. That means:
+
+- Naming conventions get copied
+- Architectural patterns get replicated
+- Anti-patterns get spread
+- Local inconsistencies get normalized
+
+Even when explicit instructions say otherwise, the agent will often mirror the patterns it sees. Telling an LLM to "follow our conventions" doesn't help if the conventions in the repo are themselves inconsistent.
+
+The implication is direct: **a healthy codebase improves AI output; a chaotic codebase poisons it.**
+
+## AI performs *worse* than humans in bad codebases
+
+Human engineers have an advantage AI doesn't: they build long-term mental models. Over months, they learn hidden conventions, historical context, architectural weaknesses, organizational quirks — and they compensate for poor systems with accumulated understanding.
+
+AI agents can't. They're largely stateless. They don't internalize architecture, don't carry persistent understanding across sessions, and struggle with fragmented or inconsistent systems.
+
+The consequence:
+
+> AI is often *more* sensitive to codebase quality than human developers.
+
+In low-quality systems, AI tends to duplicate logic, misunderstand abstractions, produce inconsistent implementations, and introduce subtle regressions. A bad codebase doesn't just slow AI down — it limits how good its output can ever be.
+
+## Feedback loops become critical
+
+As the volume of AI-generated code grows, the feedback systems around it become essential. Without them, entropy accelerates uncontrollably.
+
+High-quality engineering environments already rely on:
+
+- Strong test suites
+- Static typing
+- Linting
+- CI pipelines
+- Code review
+- Architecture constraints
+- Observability
+
+These mechanisms give fast correction signals. AI agents depend on them especially heavily because they can't reliably judge architectural quality on their own. The weaker the feedback loops, the more dangerous high-speed code generation becomes. (Deep dive: [Feedback Loops](/docs/ai-coding/feedback-loops).)
+
+## Why "code is cheap" is misleading
+
+The slogan contains a partial truth. *Writing syntax* is getting cheaper. *Maintaining systems* is not.
+
+The expensive part of software engineering has never been typing code. The expensive part is preserving a system's adaptability over time. Low-quality code creates hidden costs that show up later:
+
+- Slower future development
+- Higher operational risk
+- Onboarding friction
+- Debugging complexity
+- Architectural paralysis
+
+Eventually, even simple changes get painful. Velocity collapses. AI doesn't fix this automatically — in many cases, it accelerates the arrival.
+
+## The new value of software engineering
+
+The engineer's role is shifting. Historically, engineering value was tied tightly to implementation speed. In the AI era, the highest-leverage skills become:
+
+- Architecture design
+- Maintainability thinking
+- Abstraction quality
+- Feedback loop design
+- System decomposition
+- Entropy management
+
+The advantage will go to engineers who can build systems that stay understandable, adaptable, and evolvable under continuous AI-assisted development — not those who can merely produce code quickly.
+
+> AI changes how software is written. It does not remove the need for software engineering discipline. If anything, it intensifies it. The faster code can be generated, the more important architecture becomes.
+
+---
+
+Next: how to build the feedback loops AI depends on — see [Feedback Loops](/docs/ai-coding/feedback-loops).
+
+See also: [Tackling Big Tasks](/docs/ai-coding/tackling-big-tasks) for breaking work into vertical slices.

@@ -28,6 +28,7 @@ const SECTION_ORDER: Record<string, { title: string; order: number }> = {
   fundamentals: { title: 'Fundamentals', order: 2 },
   transformers: { title: 'Transformers', order: 3 },
   'llm-engineering': { title: 'LLM Engineering', order: 4 },
+  'ai-coding': { title: 'AI Coding', order: 5 },
 };
 
 export function getAllDocSlugs(): string[][] {

@@ -1,0 +1,161 @@
+---
+title: Feedback Loops
+description: How to steer AI agents with feedback instead of instructions — type systems, automated tests, and the do-work pattern that turns code generators into self-correcting engineering systems.
+order: 3
+---
+
+import { Screenshot } from '@/components/mdx/screenshot'
+
+# Feedback Loops
+
+AI agents naturally optimize for getting a task done quickly. Without constraints, they copy existing patterns blindly, take shortcuts that pass linting, and produce code that "works" while quietly damaging maintainability.
+
+The goal isn't to make agents productive. The goal is to make them produce **high-quality changes consistently** — and the mechanism that does that is feedback.
+
+## Feedback loops are the core mechanism
+
+The central idea is simple:
+
+> Agents improve when they continuously receive feedback about the code they generate.
+
+This mirrors how experienced engineers actually work. Good engineers don't trust their intuition, their memory, or their first implementation. They rely on systems that validate their work — types, tests, reviewers, CI. AI agents should operate the same way.
+
+<Screenshot
+  src="/images/docs/ai-coding/feedback-cycle.png"
+  alt="A circular three-node diagram: Agents → Code → Feedback → back to Agents, illustrating the self-correcting loop where the agent's output is continuously validated and the result drives the next iteration"
+  caption="Agents → Code → Feedback. The loop is what turns a generator into a self-correcting system."
+/>
+
+## Strong feedback loops
+
+Two patterns sit at the foundation of any AI-assisted workflow.
+
+### Type systems
+
+Strong typing gives the agent immediate correction signals. TypeScript catches invalid types, typos, incorrect interfaces, and unsafe assumptions — every one of which is a free piece of feedback the agent can act on without human involvement.
+
+Compared to weakly-typed systems, the quality difference in AI output is dramatic. A `tsc` error is a precise, deterministic, machine-readable instruction that says "do this differently."
+
+### Automated tests
+
+Tests provide behavioral validation. They verify business logic, edge cases, regressions, and integration correctness. The principle:
+
+> The better the test suite, the better the AI-generated code.
+
+AI gets significantly more reliable when it can:
+
+1. Make a change
+2. Run the tests
+3. Observe the failures
+4. Self-correct
+5. Re-run
+
+That loop converts an autoregressive token generator into something that behaves much closer to an engineer.
+
+## The "do-work" pattern
+
+Rather than reinventing the workflow each session ("implement this feature" and hope for the best), it's useful to formalize one. A reusable workflow skill like [`do-work`](https://skills.sh/) standardizes how an agent contributes to a repository.
+
+The workflow itself is a simple loop:
+
+### 1. Understand the task
+
+The agent reads the PRD, explores the repository, gathers context, and identifies affected systems. (See [Tackling Big Tasks](/docs/ai-coding/tackling-big-tasks) for the PRD + plan setup.)
+
+### 2. Plan the work
+
+Optional for small tasks. For larger ones: break the work into phases, define implementation steps, identify dependencies, reduce ambiguity *before* writing code.
+
+> Planning is often more valuable than implementation speed.
+
+### 3. Implement the change
+
+Only after context and planning. The agent modifies features, services, UI, or infrastructure — but implementation alone is not the finish line.
+
+### 4. Validate through feedback loops
+
+This is the most important stage. The agent runs the validators it has available:
+
+```bash
+pnpm run typecheck
+pnpm run test
+```
+
+The loop becomes:
+
+```text
+write code → receive feedback → fix issues → repeat
+```
+
+This is what turns AI from a *code generator* into a *self-correcting engineering system*.
+
+### 5. Commit the work
+
+Once validation passes, the agent stages changes and finalizes the unit of work.
+
+> AI committing code is not dangerous if strong feedback loops exist. Commits are reversible. The real danger is unvalidated code.
+
+## Skills should be concise
+
+A surprisingly important lesson: **skills should not be verbose.** Large instruction sets create noise, reduce flexibility, and compete with the repository for the agent's attention.
+
+The most effective skills typically contain:
+
+- A simple workflow
+- A few clear rules
+- Strong feedback loops
+
+Lightweight steering, not micromanagement. The repository — not the skill file — is what shapes the agent's behavior at scale.
+
+## The repository is still the source of truth
+
+Even with the best skill in place, the **codebase dominates AI behavior** (covered in detail in [Software Quality in the AI Era](/docs/ai-coding/software-quality-in-the-ai-era)). If the repository contains bad architecture, inconsistent patterns, weak testing, or poor abstractions, the agent will replicate them.
+
+Skills help guide behavior. They do not override repository quality.
+
+## AI works best in structured environments
+
+A major takeaway from working with agents at scale:
+
+> AI coding quality is highly dependent on engineering infrastructure.
+
+High-performing AI environments typically have:
+
+- Strong typing
+- Automated tests
+- CI pipelines
+- Modular architecture
+- Clear conventions
+- Small feedback cycles
+
+AI isn't replacing engineering discipline. It's amplifying its importance.
+
+## The bigger shift
+
+Traditional development looked roughly like:
+
+```text
+human writes code → QA finds bugs later
+```
+
+AI-assisted development moves toward:
+
+```text
+AI writes code → automated systems validate instantly → AI self-corrects
+```
+
+The shift produces tighter loops, faster iteration, and dramatically higher engineering leverage. The future value isn't generating more code — it's designing systems where humans, agents, tests, and tooling form a continuous quality feedback system.
+
+## Core takeaways
+
+- AI without feedback loops accelerates entropy.
+- Strong tests and strong typing dramatically improve AI output.
+- Skills create repeatable engineering workflows — keep them lean.
+- The best AI workflows mimic disciplined human engineering habits.
+- **Repository quality matters more than prompts.**
+- AI performs best when continuously validated.
+- The future of engineering is feedback-driven system design, not just code generation.
+
+---
+
+Next: how to make these validation steps **mandatory** instead of optional — see [Deterministic Feedback Loops](/docs/ai-coding/deterministic-feedback-loops).

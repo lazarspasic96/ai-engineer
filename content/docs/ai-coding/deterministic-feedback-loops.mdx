@@ -1,0 +1,153 @@
+---
+title: Deterministic Feedback Loops
+description: Why git pre-commit hooks matter more for AI agents than they ever did for humans — and how Husky, lint-staged, and Prettier turn a repository into an active quality system.
+order: 4
+---
+
+# Deterministic Feedback Loops
+
+Earlier feedback loops rely on encouragement — instructions that tell the agent to run tests, type-check, and validate before committing. Encouragement isn't enough. An agent can still forget validation, skip a check, or commit broken code if its plan doesn't require otherwise.
+
+The next evolution is making these quality checks **deterministic**: not asked for, but enforced.
+
+## Git hooks as automatic quality gates
+
+The most effective enforcement mechanism is one developers have had for years and largely under-used: **git hooks** — scripts that run automatically during git lifecycle events.
+
+For AI workflows, the critical one is:
+
+```text
+pre-commit
+```
+
+A pre-commit hook runs automatically before every commit is finalized. The effect is straightforward:
+
+- Validation becomes unavoidable
+- Broken code can't enter history
+- The agent gets immediate feedback when something fails
+
+The hook turns the repository itself into a quality gate. It doesn't matter how the agent feels about validation — the commit doesn't happen until checks pass.
+
+## Why pre-commit hooks work *especially* well for AI
+
+Historically, human developers have had a fraught relationship with pre-commit hooks. The friction is real:
+
+- Tests can take several minutes
+- Type-checking slows iteration
+- Repeated validation gets annoying
+
+So teams strip hooks down, skip them with `--no-verify`, or move them entirely to CI.
+
+AI agents don't have that problem.
+
+> AI agents don't get frustrated by repetition. When code fails type checking or tests, the agent simply tries again. ([aihero.dev](https://www.aihero.dev/essential-ai-coding-feedback-loops-for-type-script-projects))
+
+What feels restrictive for humans becomes a feature for autonomous systems. The agent doesn't lose patience, doesn't push back, and converts every failure into the next prompt for itself. Friction that slows a human becomes signal for the agent.
+
+## The self-correcting workflow
+
+Once pre-commit hooks are in place, the workflow restructures itself:
+
+```text
+write code
+    ↓
+attempt commit
+    ↓
+automatic validation runs
+    ↓
+failure detected
+    ↓
+feedback returned to AI
+    ↓
+AI fixes the issue
+    ↓
+validation re-runs
+```
+
+This is a deterministic feedback loop. The repository teaches the agent what acceptable code looks like — not by being told, but by refusing to accept anything else.
+
+## The tooling stack
+
+For JavaScript/TypeScript projects, three tools combine cleanly:
+
+| Tool | Role |
+|---|---|
+| **Husky** | Manages git hooks inside the project (so they're versioned and shared, not local-only). |
+| **lint-staged** | Runs validators only on the files that are actually staged — keeps the hook fast. |
+| **Prettier** | Enforces formatting automatically before code is committed. |
+
+Together, these don't just *document* engineering standards — they actively enforce them.
+
+## Typical validation pipeline
+
+A common pre-commit setup looks like:
+
+```bash
+npx lint-staged
+pnpm typecheck
+pnpm run test
+```
+
+What this guarantees on every commit:
+
+- Formatting rules are applied
+- Static types pass
+- The test suite passes
+
+If any step fails, the commit is blocked. The agent receives the failure output and tries again.
+
+## The repository becomes an active system
+
+One of the more important architectural shifts in AI-assisted engineering is the realization that the repository itself should **actively participate in quality control**.
+
+Traditional repositories were passive. Conventions lived in documentation, in code review comments, in the heads of senior engineers. Enforcement depended on discipline.
+
+Modern AI workflows move toward repositories that are:
+
+- **Self-validating** — checks run automatically on every change
+- **Self-enforcing** — bad changes can't progress
+- **Entropy-resistant** — quality is structural, not aspirational
+
+The system itself becomes part of the engineering process.
+
+## Infrastructure matters more than prompts
+
+A consistent lesson across AI coding workflows: **AI quality depends less on prompting sophistication and more on engineering infrastructure.**
+
+Strong AI coding environments typically contain:
+
+- Deterministic validation
+- Strong type systems
+- Automated testing
+- Formatting enforcement
+- CI pipelines
+- Modular architecture
+- Short feedback cycles
+
+These systems continuously guide and constrain the agent toward higher-quality output. Without them, AI simply accelerates entropy. (See [Software Quality in the AI Era](/docs/ai-coding/software-quality-in-the-ai-era) for why.)
+
+## The bigger shift
+
+The industry is moving from:
+
+```text
+humans manually maintaining quality
+```
+
+toward:
+
+```text
+automated systems continuously enforcing quality
+```
+
+In this future:
+
+- **Humans** design the systems
+- **Infrastructure** defines the rules
+- **AI agents** operate within those constraints
+
+The goal is no longer to generate code faster. It's to build environments where **low-quality code becomes difficult to produce**, feedback is immediate, and both humans and AI converge toward maintainable systems by default.
+
+---
+
+See also: [Feedback Loops](/docs/ai-coding/feedback-loops) for the encouragement layer this builds on, and [Software Quality in the AI Era](/docs/ai-coding/software-quality-in-the-ai-era) for why this matters more in AI-assisted environments.

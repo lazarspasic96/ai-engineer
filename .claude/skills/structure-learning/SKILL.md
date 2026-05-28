@@ -1,6 +1,6 @@
 ---
 name: structure-learning
-description: Structures raw learning notes, pasted text, exported documents (.docx / Google Docs), or external sources into a docs article for this MDX docs site, fact-checking every claim and placing it in the right section. Topics span the whole AI stack — LLM fundamentals, transformers, prompting, Claude, Codex, agents, RAG, second brain, evals, tooling — and content arrives non-linearly, so the skill always maps the full docs tree before placing and proposes new sections when needed. Ingests .docx files with Pandoc to extract embedded images as real files. Use when the user shares something they learned (notes, an article, a transcript, a link, a code snippet, a .docx/Google Doc) and wants it cleaned up, verified, and added to the documentation, or says "structure this", "add this to the docs", "I learned X", or "here's a new source".
+description: Structures raw learning notes, pasted text, exported documents (.docx / Google Docs), or external sources into a verified MDX article in this docs site. Fact-checks every claim, maps the full docs tree before placing, proposes a new section when content opens a new area, and ingests .docx files with Pandoc so embedded images come through as real files (not broken base64). Topics span the whole AI stack — LLM fundamentals, tokenization, transformers, prompting, Claude, Codex, agents, RAG, second brain, evals, MCP, AI coding workflows, tooling — and content arrives non-linearly. Use this skill whenever the user pastes AI/engineering learning material, shares a .docx / Google Doc / Markdown / link / transcript / code snippet, or says "structure this", "add this to the docs", "I learned X", "organize my notes", "put this in the docs", or "here's a new source" — even when they haven't explicitly asked to update the documentation, if they hand over learning material this is the right skill.
 ---
 
 # Structure Learning Into Docs
@@ -19,6 +19,19 @@ Match the voice of existing articles in `content/docs/` (e.g. `fundamentals/how-
 ## Workflow
 
 Do these in order. Do not skip the plan/approval gate.
+
+Copy this checklist and tick items off as you go:
+
+```text
+Structure-learning progress:
+- [ ] 0. Ingest the source (if .docx, run the pandoc script; else skip)
+- [ ] 1. Verify every factual claim with web search + official docs
+- [ ] 2. Map the full docs tree, then decide placement
+- [ ] 3. Present plan via AskUserQuestion and STOP for approval
+- [ ] 4. Write the article(s) in the docs' language
+- [ ] 5. Wire in images (real from media/ dir, or placeholder)
+- [ ] 6. Confirm what was written
+```
 
 ### 0. Ingest the source (only if given a file)
 

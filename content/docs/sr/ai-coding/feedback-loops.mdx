@@ -1,0 +1,161 @@
+---
+title: Feedback Loops
+description: Kako voditi AI agente feedback-om umesto instrukcijama — sistemi tipova, automatizovani testovi, i do-work obrazac koji generatore koda pretvara u samokorektivne inženjerske sisteme.
+order: 3
+---
+
+import { Screenshot } from '@/components/mdx/screenshot'
+
+# Feedback Loops
+
+AI agenti prirodno optimizuju za brzo završavanje zadatka. Bez ograničenja, oni slepo kopiraju postojeće obrasce, koriste prečice koje prolaze lint, i proizvode kod koji "radi" dok tiho šteti održivosti.
+
+Cilj nije da agenti budu produktivni. Cilj je da dosledno proizvode **izmene visokog kvaliteta** — a mehanizam koji to omogućava je feedback.
+
+## Feedback loops su osnovni mehanizam
+
+Centralna ideja je jednostavna:
+
+> Agenti se poboljšavaju kada kontinuirano dobijaju feedback o kodu koji generišu.
+
+Ovo odražava način na koji iskusni inženjeri zaista rade. Dobri inženjeri ne veruju svojoj intuiciji, svom pamćenju, ni svojoj prvoj implementaciji. Oslanjaju se na sisteme koji validiraju njihov rad — tipove, testove, review-ere, CI. AI agenti treba da rade na isti način.
+
+<Screenshot
+  src="/images/docs/ai-coding/feedback-cycle.png"
+  alt="Kružni dijagram sa tri čvora: Agents → Code → Feedback → nazad ka Agents, koji ilustruje samokorektivnu petlju u kojoj se izlaz agenta kontinuirano validira i rezultat pokreće sledeću iteraciju"
+  caption="Agents → Code → Feedback. Petlja je ono što generator pretvara u samokorektivni sistem."
+/>
+
+## Snažni feedback loops
+
+Dva obrasca su u temelju svakog AI-asistiranog workflow-a.
+
+### Sistemi tipova
+
+Snažni tipovi daju agentu trenutne signale za korekciju. TypeScript hvata pogrešne tipove, typo greške, neispravne interfejse i opasne pretpostavke — svaki od njih je besplatan feedback na koji agent može da reaguje bez ljudskog mešanja.
+
+U poređenju sa slabo-tipiziranim sistemima, razlika u kvalitetu AI izlaza je dramatična. `tsc` greška je precizna, deterministička, mašinski čitljiva instrukcija koja kaže "radi ovo drugačije".
+
+### Automatizovani testovi
+
+Testovi pružaju validaciju ponašanja. Verifikuju business logiku, edge case-ove, regresije i ispravnost integracija. Princip:
+
+> Što je test suite bolji, to je AI-generisani kod bolji.
+
+AI postaje značajno pouzdaniji kada može da:
+
+1. Napravi izmenu
+2. Pokrene testove
+3. Posmatra padove
+4. Samokoriguje
+5. Ponovo pokrene
+
+Ta petlja pretvara autoregresivni generator tokena u nešto što se mnogo bliže ponaša kao inženjer.
+
+## "do-work" obrazac
+
+Umesto izmišljanja workflow-a svake sesije ("implementiraj ovaj feature" i nada se najboljem), korisno je formalizovati jedan. Skill za workflow koji se koristi više puta kao što je [`do-work`](https://skills.sh/) standardizuje način na koji agent doprinosi repozitorijumu.
+
+Sam workflow je jednostavna petlja:
+
+### 1. Razumi zadatak
+
+Agent čita PRD, istražuje repository, prikuplja kontekst i identifikuje pogođene sisteme. (Vidite [Rad sa velikim taskovima](/sr/docs/ai-coding/tackling-big-tasks) za podešavanje PRD + plana.)
+
+### 2. Isplaniraj rad
+
+Opcionalno za male zadatke. Za veće: razbij rad u faze, definiši implementacijske korake, identifikuj dependencies, smanji dvosmislenost *pre* pisanja koda.
+
+> Planiranje je često vrednije od brzine implementacije.
+
+### 3. Implementiraj izmenu
+
+Tek nakon konteksta i planiranja. Agent menja feature-e, servise, UI ili infrastrukturu — ali implementacija sama nije ciljna linija.
+
+### 4. Validiraj kroz feedback loops
+
+Ovo je najvažnija faza. Agent pokreće validator-e koji su mu na raspolaganju:
+
+```bash
+pnpm run typecheck
+pnpm run test
+```
+
+Petlja postaje:
+
+```text
+napiši kod → primi feedback → popravi probleme → ponovi
+```
+
+To je ono što pretvara AI iz *generatora koda* u *samokorektivni inženjerski sistem*.
+
+### 5. Commit-uj rad
+
+Kada validacija prođe, agent stage-uje izmene i finalizuje jedinicu rada.
+
+> AI koji commit-uje kod nije opasan ako postoje snažni feedback loops. Commit-ovi su reverzibilni. Prava opasnost je nevalidiran kod.
+
+## Skill-ovi treba da budu sažeti
+
+Iznenađujuće važna lekcija: **skill-ovi ne bi trebalo da budu opširni.** Veliki skupovi instrukcija stvaraju šum, smanjuju fleksibilnost i takmiče se sa repozitorijumom za pažnju agenta.
+
+Najefikasniji skill-ovi obično sadrže:
+
+- Jednostavan workflow
+- Nekoliko jasnih pravila
+- Snažne feedback loops
+
+Lagano vođenje, ne mikromenadžment. Repozitorijum — ne skill fajl — je ono što oblikuje ponašanje agenta na velikoj skali.
+
+## Repozitorijum je i dalje source of truth
+
+Čak i sa najboljim skill-om na mestu, **codebase dominira ponašanjem AI-ja** (detaljno pokriveno u [Kvalitet softvera u AI eri](/sr/docs/ai-coding/software-quality-in-the-ai-era)). Ako repozitorijum sadrži lošu arhitekturu, nedosledne obrasce, slabo testiranje ili loše apstrakcije, agent će ih replicirati.
+
+Skill-ovi pomažu da se vodi ponašanje. Ne nadjačavaju kvalitet repozitorijuma.
+
+## AI najbolje radi u strukturisanim okruženjima
+
+Glavni zaključak iz rada sa agentima na skali:
+
+> Kvalitet AI coding-a u velikoj meri zavisi od inženjerske infrastrukture.
+
+Visoko-performansna AI okruženja obično imaju:
+
+- Snažno tipiziranje
+- Automatizovane testove
+- CI pipeline-e
+- Modularnu arhitekturu
+- Jasne konvencije
+- Male feedback cikluse
+
+AI ne zamenjuje inženjersku disciplinu. Pojačava njen značaj.
+
+## Veći pomak
+
+Tradicionalni razvoj je grubo izgledao ovako:
+
+```text
+čovek piše kod → QA pronalazi bag-ove kasnije
+```
+
+AI-asistirani razvoj kreće ka:
+
+```text
+AI piše kod → automatizovani sistemi trenutno validiraju → AI samokoriguje
+```
+
+Pomak proizvodi uže petlje, bržu iteraciju i dramatično veći inženjerski leverage. Buduća vrednost nije u generisanju više koda — u dizajniranju sistema u kojima ljudi, agenti, testovi i alati formiraju kontinuirani sistem feedback-a za kvalitet.
+
+## Ključni zaključci
+
+- AI bez feedback loops-a ubrzava entropy.
+- Snažni testovi i snažno tipiziranje dramatično poboljšavaju AI izlaz.
+- Skill-ovi prave ponovljive inženjerske workflow-e — držite ih sažetim.
+- Najbolji AI workflow-i imitiraju disciplinovane ljudske inženjerske navike.
+- **Kvalitet repozitorijuma je važniji od prompt-ova.**
+- AI najbolje radi kada je kontinuirano validiran.
+- Budućnost inženjeringa je feedback-driven system design, ne samo generisanje koda.
+
+---
+
+Sledeće: kako učiniti ove validacione korake **obaveznim** umesto opcionim — vidite [Deterministički Feedback Loops](/sr/docs/ai-coding/deterministic-feedback-loops).

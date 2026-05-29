@@ -1,0 +1,172 @@
+---
+title: Tokenizacija
+description: Kako LLM-ovi pretvaraju sirovi tekst u diskretne brojeve koje zaista obrađuju — šta je token, zašto je tokenizacija bitna i gde se lomi.
+order: 5
+---
+
+import { Screenshot } from '@/components/mdx/screenshot'
+
+# Tokenizacija
+
+LLM-ovi ne čitaju tekst. Čitaju brojeve. Pre nego što model može da obradi makar jednu reč, ta reč mora da se pretvori u sekvencu celih brojeva — a korak koji to radi zove se **tokenizacija**.
+
+<Screenshot
+  src="/images/docs/fundamentals/tokenization.png"
+  alt="Tokenizacija pretvara sirovi tekst sa leve strane u dugačku sekvencu diskretnih brojeva sa desne"
+  caption="Tokenizacija pretvara sirovi tekst u dugačku sekvencu diskretnih brojeva koje model može da obradi."
+/>
+
+Tokenizacija prati specifičan algoritam — fiksni skup pravila koji deli tekst u jedinice zvane tokeni i mapira svaku u broj. To je most između teksta čitljivog ljudima i numeričkog ulaza koji očekuje neuronska mreža.
+
+## Šta je token
+
+Token je fundamentalna jedinica teksta koju LLM obrađuje. Šaljete tokene modelu, naplaćujete se po tokenu, a model čita, predviđa i generiše u tokenima — ne u rečima.
+
+Token **nije** isto što i reč. Kada otkucate `Hello world!` u ChatGPT, on ne vidi dve reči i znak interpunkcije. Vidi četiri različita tokena:
+
+```text
+"Hello world!"  →  ["Hello", " world", "!", "\n"]
+```
+
+Primetite da su razmak i newline na kraju deo tokena — tokenizer-i čuvaju whitespace jer on nosi značenje.
+
+U zavisnosti od tokenizer-a, jedan token može da predstavlja:
+
+- pojedinačni karakter
+- subword (deo reči)
+- kompletnu reč
+- znak interpunkcije
+- whitespace ili specijalni karakter
+
+Korisna mentalna slika je LEGO. Model nikada ne vidi cele rečenice kao reči — vidi skup ponovo upotrebljivih kockica koje može da sklopi:
+
+```text
+"I love machine learning!"
+ ↓
+[I] [ love] [ machine] [ learn] [ing] [!]
+```
+
+Reč "learning" se deli u `learn` + `ing` — dve ponovo upotrebljive kockice koje model može da rekombinuje u "learned", "learner" ili "burning".
+
+## Token ≠ reč
+
+Pošto su tokeni subword komadi, broj tokena u tekstu retko se poklapa sa brojem reči. To je i suština: LLM-ovi imaju **ograničene rečnike (vocabulary)** — obično 30.000 do 100.000 tokena. Fiksni rečnik te veličine ne može da sadrži svaku reč na svakom jeziku, pa tokenizer-i razbijaju retke ili složene reči na manje, ponovo upotrebljive komade:
+
+```text
+"extraordinary"  →  "extra" + "ordinary"
+```
+
+Komponovanjem subword-ova, ograničen rečnik može da izrazi neograničen prostor reči. Najčešći algoritam za učenje ovih komada je **Byte-Pair Encoding (BPE)**, koji kreće od pojedinačnih karaktera i iterativno spaja najčešći susedni par dok rečnik ne dostigne ciljanu veličinu.
+
+## Zašto je tokenizacija bitna
+
+Tokenizacija nije samo "vodovod" — njen kvalitet oblikuje koliko dobro i koliko jeftino model radi.
+
+| Razlog | Zašto je bitno |
+|--------|----------------|
+| **Upravljanje rečnikom** | Rečnik od 30K–100K mora da pokrije neograničen jezik. Subword deljenje to čini mogućim. |
+| **Rukovanje nepoznatim rečima** | Reč koju model nikada nije video — npr. "biocatalyst" — i dalje može da bude razumljiva kao `bio` + `catalyst`, dva poznata komada. |
+| **Efikasnost** | Dužina sekvence direktno utiče na cenu computa. Manje tokena po tekstu znači jeftinija i brža obrada. |
+| **Performanse modela** | Loša tokenizacija šteti razumevanju i generisanju — posebno za ne-engleski tekst i specijalizovane domene. |
+
+## Od tokena do brojeva
+
+Deljenje teksta u tokene je tek pola posla. Svaki token i dalje mora da postane broj sa kojim mreža može da radi matematiku.
+
+Svaki token u rečniku dobija jedinstveni ceo broj — svoj **token ID**:
+
+```text
+"Hello"   →  token ID 15496
+" world"  →  token ID 995
+```
+
+Ovi ID-evi se zatim pretvaraju u **embedding-e**: guste vektore realnih brojeva, obično 512, 1024 ili više dimenzija. Embedding za "Hello" može da izgleda kao `[0.23, -0.45, 0.78, ...]`. Embedding-zi su ono što omogućava modelu da predstavi značenje — slični tokeni završe sa sličnim vektorima.
+
+Kompletan pipeline od teksta do ulaza u model:
+
+```text
+Tekst:       "Hello world"
+  ↓ Tokenizacija
+Tokeni:      ["Hello", " world"]
+  ↓ Token ID-evi
+ID-evi:      [15496, 995]
+  ↓ Embedding sloj
+Vektori:     [[0.23, -0.45, 0.78, ...], [0.12, 0.89, -0.34, ...]]
+  ↓ Transformer
+Neuronska mreža obrađuje numeričke vektore
+```
+
+Svaka kompanija koristi svoj algoritam tokenizacije, i njegova efikasnost direktno utiče i na context kapacitet modela i na kvalitet njegovog izlaza.
+
+## Context window
+
+Pošto model radi u tokenima, njegove granice se mere u tokenima. **Context window** je maksimalan broj tokena koje model može da obradi odjednom. Utiče na:
+
+- **Dužinu ulaza** — koliko teksta model može da razmotri pre odgovora
+- **Dužinu izlaza** — koliko može da generiše u jednoj kompletaciji
+- **Koherenciju** — koliko ostaje konzistentan kroz duge razgovore ili dokumente
+
+Efikasnija tokenizacija znači da više stvarnog sadržaja staje u isti context window.
+
+## Gde se tokenizacija lomi
+
+Tokenizacija uzrokuje nekoliko kontraintuitivnih ponašanja u praksi.
+
+### Ne-engleski jezici
+
+Tokenizer-i se uglavnom treniraju na engleskom tekstu, jednostavno zato što je internet dominantno engleski. Tako su naučili da efikasno tokenizuju engleski — a sve ostalo manje efikasno.
+
+Zamislite rečnik od 50.000 reči izgrađen na taj način:
+
+- ~40.000 engleskih reči
+- ~5.000 reči za jedan drugi jezik
+- ~5.000 za sve preostale jezike zajedno
+
+Efekat se vidi direktno u broju tokena. Engleska reč koju tokenizer dobro poznaje deli se na malo komada, dok ekvivalentna reč na drugom jeziku biva razbijena na mnogo komada:
+
+```text
+"unhappiness"  →  ["un", "happiness"]        = 2 tokena
+"nesreća"      →  ["n", "es", "re", "ć", "a"] = 5 tokena
+```
+
+Isto značenje, više nego duplo tokena — što znači da ne-engleski korisnici plaćaju više i staje im manje u context window. (Tačni splitovi zavise od tokenizer-a; ovo su ilustrativni primeri.)
+
+#### Koliko više, tačnije
+
+Razlika nije zanemariva — peer-reviewed studije su to merile na desetinama jezika. Odnosi se grupišu prema sistemu pisanja:
+
+| Jezička porodica | Tokeni naspram istog značenja na engleskom | Praktični množilac troška |
+|---|---|---|
+| Engleski / Latinica (baseline) | 1× | 1× |
+| Ćirilica (srpski, ruski, ukrajinski, …) | 2–3× | ~2–3× |
+| Kineski / japanski / korejski (CJK) | ~1 token po karakteru naspram ~4 karaktera/token u engleskom | ~4–5× |
+| Drugi ne-latinski / morfološki složeni (hindi, arapski, hebrejski, …) | 3–5× | 3–5× |
+
+Dva tehnička razloga se kombinuju:
+
+- **BPE je treniran uglavnom na engleskom tekstu.** Byte-Pair Encoding uči merge-eve iz frekvencije u trening korpusu. Ne-latinski karakteri se nisu dovoljno često pojavljivali tokom BPE treninga da formiraju mnogo merge-eva, pa ostaju isečeni na sitne komade.
+- **UTF-8 encoding penalty.** Latinski karakteri su po 1 bajt, ali ćirilica, CJK i mnoga druga pisma se kodiraju kao 2–3 bajta po karakteru. Već pre tokenizacije postoji byte-level overhead koji merge-evi ne mogu u potpunosti da nadoknade.
+
+Implikacija je direktna: **smart zone vašeg context window-a se smanjuje proporcionalno troškovima tokenizacije**. Prozor od 200K tokena koji drži ~150K engleskih tokena upotrebljivog konteksta drži samo ~50K–75K ekvivalentnih kineskih tokena, i ~60K–100K ćiriličnih. To je i razlog zašto pisanje dokumentacije, commit poruka i komentara u kodu na engleskom nije samo stilska odluka — to je 2–5× množilac efikasnosti za bilo kog agenta koji čita repozitorijum.
+
+Rad sa arXiv-a [*Language Model Tokenizers Introduce Unfairness Between Languages*](https://arxiv.org/abs/2305.15425) postavlja ovo kao strukturnu nepravdu, a ne kao implementacijski bag. Govornici nedovoljno zastupljenih jezika plaćaju više za isti zadatak — i u dolarima i u efektivnom kontekstu.
+
+### Specijalni karakteri
+
+Emoji i neobično formatiranje mogu da potroše mnogo više tokena nego što se očekuje. Jedan emoji poput 🧠 može da zauzme nekoliko tokena u zavisnosti od tokenizer-a, tiho povećavajući utrošak tokena.
+
+### Brojevi i kod
+
+Neki tokenizer-i fragmentiraju brojeve i programske konstrukcije na čudne načine, deleći ih kroz više tokena. To je glavni razlog zašto LLM-ovi muku muče sa aritmetikom i tačnim generisanjem koda — vide fragmentovane simbole, a ne čiste brojeve.
+
+---
+
+Za to kako se tokeni uklapaju u širu sliku gradnje modela, vidite [Kako se LLM-ovi grade](/sr/docs/fundamentals/how-llms-are-built).
+
+## Izvori
+
+- Petrov, Malkin et al. — [*Language Model Tokenizers Introduce Unfairness Between Languages*](https://arxiv.org/abs/2305.15425). Peer-reviewed studija o tokenizaciji kroz jezike (arXiv 2305.15425).
+- [*Tokenization Disparities as Infrastructure Bias: How Subword Systems Create Inequities in LLM Access and Efficiency*](https://arxiv.org/abs/2510.12389) — naredna studija koja kvantifikuje 3–5× odnose troškova za ne-latinske i morfološki složene jezike (arXiv 2510.12389).
+- ByteByteGo — [*How LLMs See the World*](https://blog.bytebytego.com/p/how-llms-see-the-world). Objašnjava zašto se `Hello world!` tokenizuje u četiri tokena i kako se token ID-evi i embedding-zi povezuju.
+- PromptCost — [*LLM Tokenization Explained: English vs Other Languages Cost Difference*](https://promptcost.org/blog/llm-tokenization-explained/). Praktičan pregled razlike u troškovima po pismu.
+- OpenAI Developer Community — [*Token size in Russian lang*](https://community.openai.com/t/token-size-in-russian-lang/30767). Reproducibilna merenja odnosa ćirilica/latinica u OpenAI tokenizer-ima.

@@ -1,18 +1,18 @@
 ---
-title: Kvalitet softvera u AI eri
-description: Zašto je "kod je jeftin" zavaravajuće, šta zapravo jeste software entropy, i zašto su AI agenti osetljiviji na kvalitet codebase-a od ljudskih inženjera.
+title: Software Quality in the AI Era
+description: Why "code is cheap" is misleading, what software entropy actually is, and why AI agents are more sensitive to codebase quality than human engineers.
 order: 2
 ---
 
-# Kvalitet softvera u AI eri
+# Software Quality in the AI Era
 
 Postoji rastući narativ da je kod postao jeftin jer AI može da ga generiše za sekunde. Komponente, API-ji, testovi, infrastruktura — sve se pokreće brže nego što bi pre nekoliko godina. Ali to proizvodi opasnu zabludu:
 
-> Brže generisanje koda ne proizvodi automatski bolje softverske sisteme.
+> Faster code generation does not automatically produce better software systems.
 
 U mnogim slučajevima, AI ubrzava jedan od najstarijih problema u softverskom inženjeringu: **software entropy**. U AI eri, kvalitet softvera je važniji, ne manje važan.
 
-## Šta kvalitet softvera zaista jeste
+## What software quality actually is
 
 "Kvalitet softvera" se često meša sa površinskim osobinama — čistom sintaksom, modernim framework-ima, formatovanim kodom, testovima koji prolaze. Ništa od toga nije pogrešno, ali to nije definicija.
 
@@ -48,7 +48,7 @@ Zato zreli sistemi "deluju teško":
 
 Entropy je kumulativna. Bez svesne kontra-sile, softver teži ka neredu.
 
-## Većina commit-ova poboljšava feature-e dok šteti arhitekturi
+## Most commits improve features while damaging architecture
 
 Oštra opservacija: ogromna većina commit-ova u bilo kom projektu **dodaje funkcionalnost ili krpi bag-ove**. Vrlo malo commit-ova pojednostavljuje arhitekturu, smanjuje coupling ili poboljšava apstrakcije.
 
@@ -62,7 +62,7 @@ Ta asimetrija je motor entropy-ja. Feature rad neprekidno podiže složenost; ra
 | | Jačaju testove |
 | | Poboljšavaju developer ergonomics |
 
-## Refactoring je kontra-pritisak
+## Refactoring is the counter-pressure
 
 Refactoring nije kozmetika. To je primarni mehanizam za otpor entropy-ju. Dobro odrađen, on:
 
@@ -73,7 +73,7 @@ Refactoring nije kozmetika. To je primarni mehanizam za otpor entropy-ju. Dobro 
 
 Jedan dobro ciljan refactor može uštedeti stotine inženjerskih sati u budućnosti. U AI-asistiranim okruženjima ovo je važnije, ne manje važno — jer AI agenti zavise od strukturne jasnoće da bi radili dobar posao.
 
-## AI menja *brzinu* entropy-ja
+## AI changes the *speed* of entropy
 
 AI dramatično ubrzava produkciju koda. To je njegova snaga. To je i njegov rizik.
 
@@ -94,11 +94,11 @@ Ali teški problemi u softverskom inženjeringu nisu generisanje. To su:
 
 Ovo ostaju slabe tačke za AI. Pa je rezultat:
 
-> AI povećava stopu software entropy-ja osim ako okolni sistem nije dizajniran da mu se odupre.
+> AI increases the rate of software entropy unless the surrounding system is designed to resist it.
 
 Ako loši obrasci već postoje u codebase-u, AI će ih replicirati na velikoj skali. Najbrži put do katastrofalno zapletenog codebase-a sada je AI agent koji entuzijastično radi unutar već zapletenog.
 
-## Codebase je pravi prompt
+## The codebase is the real prompt
 
 Mnogi inženjeri pretpostavljaju da se ponašanje AI-ja kontroliše uglavnom kroz prompt-ove, instrukcije ili rules fajlove. U praksi, najjači uticaj na AI-generisani kod je **sam postojeći codebase**.
 
@@ -111,9 +111,9 @@ Agent tretira repository kao source of truth. To znači:
 
 Čak i kada eksplicitne instrukcije kažu drugačije, agent će često reflektovati obrasce koje vidi. Reći LLM-u "prati naše konvencije" ne pomaže ako konvencije u repo-u i same nisu konzistentne.
 
-Implikacija je direktna: **zdrav codebase poboljšava AI izlaz; haotičan codebase ga truje.**
+Implikacija je direktna: **a healthy codebase improves AI output; a chaotic codebase poisons it.**
 
-## AI radi *lošije* od ljudi u lošim codebase-ovima
+## AI performs *worse* than humans in bad codebases
 
 Ljudski inženjeri imaju prednost koju AI nema: grade dugoročne mentalne modele. Kroz mesece uče skrivene konvencije, istorijski kontekst, arhitektonske slabosti, organizacione čudnoće — i kompenzuju loše sisteme akumuliranim razumevanjem.
 
@@ -121,11 +121,11 @@ AI agenti ne mogu to. Uglavnom su stateless. Ne internalizuju arhitekturu, ne no
 
 Posledica:
 
-> AI je često *osetljiviji* na kvalitet codebase-a nego ljudski developeri.
+> AI is often *more* sensitive to codebase quality than human developers.
 
 U sistemima niskog kvaliteta, AI ima tendenciju da duplira logiku, pogrešno razume apstrakcije, proizvodi nedosledne implementacije i uvodi suptilne regresije. Loš codebase ne samo da usporava AI — ograničava koliko dobar njegov output ikada može biti.
 
-## Feedback loops postaju kritični
+## Feedback loops become critical
 
 Kako raste obim AI-generisanog koda, sistemi povratnih informacija oko njega postaju esencijalni. Bez njih, entropy se ubrzava nekontrolisano.
 
@@ -141,7 +141,7 @@ Inženjerska okruženja visokog kvaliteta već se oslanjaju na:
 
 Ovi mehanizmi daju brze signale za korekciju. AI agenti zavise od njih posebno jer ne mogu pouzdano da procene arhitektonski kvalitet sami. Što su feedback loops slabiji, to je high-speed generisanje koda opasnije. (Dublja analiza: [Feedback Loops](/sr/docs/ai-coding/feedback-loops).)
 
-## Zašto je "kod je jeftin" zavaravajuće
+## Why "code is cheap" is misleading
 
 Slogan sadrži delimičnu istinu. *Pisanje sintakse* postaje jeftinije. *Održavanje sistema* nije.
 
@@ -155,11 +155,11 @@ Skupi deo softverskog inženjeringa nikada nije bio kucanje koda. Skupi deo je o
 
 Na kraju, čak i jednostavne izmene postanu bolne. Velocity se ruši. AI ovo ne rešava automatski — u mnogim slučajevima, ubrzava dolazak.
 
-## Nova vrednost softverskog inženjeringa
+## The new value of software engineering
 
 Uloga inženjera se menja. Istorijski, vrednost inženjeringa je bila tesno vezana za brzinu implementacije. U AI eri, najveće leverage veštine postaju:
 
-- Arhitektonski dizajn
+- Architecture design
 - Razmišljanje o održivosti
 - Kvalitet apstrakcija
 - Dizajn feedback loops-a
@@ -168,10 +168,10 @@ Uloga inženjera se menja. Istorijski, vrednost inženjeringa je bila tesno veza
 
 Prednost će dobiti inženjeri koji mogu da grade sisteme koji ostaju razumljivi, prilagodljivi i razvojni pod kontinuiranim AI-asistiranim razvojem — ne oni koji jednostavno mogu da brzo proizvode kod.
 
-> AI menja kako se softver piše. Ne uklanja potrebu za disciplinom softverskog inženjeringa. Ako išta, intenzivira je. Što brže kod može da se generiše, to arhitektura postaje važnija.
+> AI changes how software is written. It does not remove the need for software engineering discipline. If anything, it intensifies it. The faster code can be generated, the more important architecture becomes.
 
 ---
 
 Sledeće: kako izgraditi feedback loops na koje se AI oslanja — vidite [Feedback Loops](/sr/docs/ai-coding/feedback-loops).
 
-Pogledajte i: [Rad sa velikim taskovima](/sr/docs/ai-coding/tackling-big-tasks) za razbijanje rada na vertikalne slice-eve.
+Pogledajte i: [Tackling Big Tasks](/sr/docs/ai-coding/tackling-big-tasks) za razbijanje rada na vertical slice-eve.

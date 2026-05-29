@@ -1,18 +1,18 @@
 ---
-title: Rad sa velikim taskovima
-description: Kako isporučiti velike, više-slojne feature-e sa AI agentima — rad unutar smart zone context window-a, korišćenje PRD-a kao destinacije i plana kao putovanja, i usvajanje tracer bullets pristupa umesto layer-by-layer implementacije.
+title: Tackling Big Tasks
+description: How to ship large, multi-layer features with AI agents — working inside the smart zone of the context window, using PRDs as destination and plans as journey, and adopting tracer bullets instead of layer-by-layer implementation.
 order: 1
 ---
 
 import { Screenshot } from '@/components/mdx/screenshot'
 
-# Rad sa velikim taskovima
+# Tackling Big Tasks
 
 Dugotrajna tema u AI-asistiranom inženjeringu jeste da **veličina ubija**. LLM može da završi malu, fokusiranu izmenu za nekoliko sekundi, ali isti model na više-dnevnom epic-u tiho proizvede drift, slop i kod koji nigde ne vodi. Rešenje nije pametniji model — već manja jedinica rada.
 
-Ovaj članak pokriva tri ideje koje, zajedno, čine velike taskove isporučivim: **smart zone** context window-a, **podelu na PRD i plan**, i **tracer bullets** za vertikalno deljenje (vertical slicing).
+Ovaj članak pokriva tri ideje koje, zajedno, čine velike taskove isporučivim: **smart zone** context window-a, **podelu na PRD i plan**, i **tracer bullets** za vertical slicing.
 
-## Smart zone context window-a
+## The smart zone of the context window
 
 Moderni frontier modeli reklamiraju ogromne context window-e — 200K, 1M, čak i više tokena. U praksi, **efektivni kvalitet rezonovanja modela degradira znatno pre navedenog limita**. Uobičajena heuristika u zajednici je da model ostaje u svojoj "smart zone" otprilike kroz prvih 60–80% prozora od 200K — recimo ~120K–160K tokena — i počinje da pravi suptilne greške iznad toga.
 
@@ -22,7 +22,7 @@ To je rule of thumb, a ne merenje. Ali efekat ispod toga je stvaran i dobro doku
 
 Zato veliki feature ne može jednostavno da se ubaci u jedan prompt. Čak i kada stane, model postaje sve gori što dublje ide.
 
-## PRD kao destinacija, plan kao putovanje
+## PRD as destination, plan as journey
 
 Rešenje je isto ono koje developeri koriste decenijama: razbiti rad na komade. Dva artefakta to rade čisto:
 
@@ -41,7 +41,7 @@ PRD je isti artefakt koji bi product manager istorijski predao developeru. U ovo
 
 Matt Pocock-ov skill [`to-prd`](https://skills.sh/mattpocock/skills/to-prd) je korisna polazna tačka: pretvara labav razgovor u strukturisan PRD sa user story-ima.
 
-## Zamka: implementacija layer po layer
+## The trap: implementing layer by layer
 
 Kada predate plan LLM-u i kažete mu "izgradi feature", njegov prirodan refleks je da ide **horizontalno**: završi ceo backend, pa ceo frontend, pa QA. Kroz mikroservise radi isto — završi servis A, pa servis B.
 
@@ -55,11 +55,11 @@ Ovo izgleda uredno ali pravi pravi problem: **feedback ne dobijate sve do posled
 
 Plan u ovom obliku je i previše specifičan prerano. Referencira funkcije i varijable koje još uvek ne postoje, pa čim se neki implementacijski detalj promeni, plan mora da se prepisuje. To je plan za vibe coding, ne za isporuku.
 
-## Tracer bullets i vertikalni slice-evi
+## Tracer bullets and vertical slices
 
 Rešenje je koncept iz knjige *The Pragmatic Programmer* koji postoji decenijama: **tracer bullets**. ([aihero.dev](https://www.aihero.dev/tracer-bullets))
 
-Umesto završavanja horizontalnog layer-a po layer-a, svaka faza plana seče **vertikalni slice** kroz svaki layer sistema — minimalan end-to-end put koji zaista radi. Prva faza je mala i ružna, ali dodiruje backend, frontend i testove. Dobijate ranu povratnu informaciju da critical path drži. Svaka naredna faza širi slice.
+Umesto završavanja horizontalnog layer-a po layer-a, svaka faza plana seče **vertical slice** kroz svaki layer sistema — minimalan end-to-end put koji zaista radi. Prva faza je mala i ružna, ali dodiruje backend, frontend i testove. Dobijate ranu povratnu informaciju da critical path drži. Svaka naredna faza širi slice.
 
 <Screenshot
   src="/images/docs/ai-coding/tracer-bullets-vertical-slices.png"
@@ -67,16 +67,16 @@ Umesto završavanja horizontalnog layer-a po layer-a, svaka faza plana seče **v
   caption="Tracer bullets: svaka faza seče odozgo nadole, tako da feedback stiže u fazi jedan — ne u fazi četiri."
 />
 
-Mantra je: **integrišite rano, tražite feedback često**. Svaki vertikalni slice je mali MVP za zadatak. Verifikujete contract end-to-end pre nego što ga proširite.
+Mantra je: **integrate early, seek feedback often**. Svaki vertical slice je mali MVP za zadatak. Verifikujete contract end-to-end pre nego što ga proširite.
 
 > "AI's natural inclination is to build big layers in isolation. You need to make it do an end-to-end slice across all the vertical layers."
 
-Matt Pocock-ov skill [`prd-to-issues`](https://skills.sh/mattpocock/skills/to-issues) ovo operacionalizuje: uzima PRD i izbacuje plan čije faze *jesu* vertikalni slice-evi, svaki dovoljno mali da stane u smart-zone context window. Da li slice-evi žive kao faze unutar jednog plana ili kao odvojeni issue-i nije bitno — bitno je da je svaki tanak, end-to-end rez.
+Matt Pocock-ov skill [`prd-to-issues`](https://skills.sh/mattpocock/skills/to-issues) ovo operacionalizuje: uzima PRD i izbacuje plan čije faze *jesu* vertical slice-evi, svaki dovoljno mali da stane u smart-zone context window. Da li slice-evi žive kao faze unutar jednog plana ili kao odvojeni issue-i nije bitno — bitno je da je svaki tanak, end-to-end rez.
 
-## Kako se sve uklapa
+## How this fits together
 
 1. Napišite **PRD** — šta gradite, zašto i za koga. Bez code-level detalja.
-2. Generišite **plan** vertikalnih slice-eva — svaki end-to-end tracer bullet.
+2. Generišite **plan** vertical slice-eva — svaki end-to-end tracer bullet.
 3. Izvršite jedan slice u svom svežem context window-u, dobro unutar smart zone.
 4. Posle svakog slice-a, pregledajte feedback — testovi, tipovi, ponašanje — i podesite naredni slice.
 
@@ -84,6 +84,6 @@ Ljudska uloga se menja: umesto da držite ceo zadatak u glavi, vodite agenta sli
 
 ---
 
-Sledeće: kako dizajnirati inženjersko okruženje tako da slice-evi sleću u codebase koji *pomaže* agentu — vidite [Kvalitet softvera u AI eri](/sr/docs/ai-coding/software-quality-in-the-ai-era).
+Sledeće: kako dizajnirati inženjersko okruženje tako da slice-evi sleću u codebase koji *pomaže* agentu — vidite [Software Quality in the AI Era](/sr/docs/ai-coding/software-quality-in-the-ai-era).
 
-Pozadinsko čitanje: [Context window granice](/sr/docs/fundamentals/how-llms-are-built#context-window).
+Pozadinsko čitanje: [Context window limits](/sr/docs/fundamentals/how-llms-are-built#context-window).

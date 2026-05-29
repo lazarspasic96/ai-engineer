@@ -1,18 +1,18 @@
 ---
-title: Deterministički Feedback Loops
-description: Zašto su git pre-commit hook-ovi važniji za AI agente nego što su ikada bili za ljude — i kako Husky, lint-staged i Prettier pretvaraju repozitorijum u aktivan sistem kvaliteta.
+title: Deterministic Feedback Loops
+description: Why git pre-commit hooks matter more for AI agents than they ever did for humans — and how Husky, lint-staged, and Prettier turn a repository into an active quality system.
 order: 4
 ---
 
-# Deterministički Feedback Loops
+# Deterministic Feedback Loops
 
 Raniji feedback loops oslanjaju se na ohrabrenje — instrukcije koje govore agentu da pokrene testove, type-check i validira pre commit-a. Ohrabrenje nije dovoljno. Agent i dalje može da zaboravi validaciju, preskoči check ili commit-uje pokvaren kod ako njegov plan to ne zahteva.
 
 Sledeća evolucija je činiti ove provere kvaliteta **determinističkim**: ne traženim, već nametnutim.
 
-## Git hook-ovi kao automatska vrata kvaliteta
+## Git hooks as automatic quality gates
 
-Najefikasniji mehanizam nametanja je nešto što developeri imaju godinama i uglavnom slabo koriste: **git hook-ovi** — skripte koje se automatski izvršavaju tokom git lifecycle događaja.
+Najefikasniji mehanizam nametanja je nešto što developeri imaju godinama i uglavnom slabo koriste: **git hooks** — skripte koje se automatski izvršavaju tokom git lifecycle događaja.
 
 Za AI workflow-e, kritičan je:
 
@@ -26,9 +26,9 @@ Pre-commit hook se izvršava automatski pre nego što se svaki commit finalizuje
 - Pokvaren kod ne može da uđe u istoriju
 - Agent dobija trenutan feedback kada nešto padne
 
-Hook pretvara sam repozitorijum u vrata kvaliteta. Nije bitno kako se agent oseća prema validaciji — commit se ne dešava dok provere ne prođu.
+Hook pretvara sam repository u vrata kvaliteta. Nije bitno kako se agent oseća prema validaciji — commit se ne dešava dok provere ne prođu.
 
-## Zašto pre-commit hook-ovi rade *posebno* dobro za AI
+## Why pre-commit hooks work *especially* well for AI
 
 Istorijski, ljudski developeri imali su tegoban odnos sa pre-commit hook-ovima. Friction je stvaran:
 
@@ -40,45 +40,45 @@ Pa timovi smanjuju hook-ove, preskaču ih sa `--no-verify`, ili ih u potpunosti 
 
 AI agenti nemaju taj problem.
 
-> AI agenti se ne frustriraju ponavljanjem. Kada kod padne type checking ili testove, agent jednostavno pokušava ponovo. ([aihero.dev](https://www.aihero.dev/essential-ai-coding-feedback-loops-for-type-script-projects))
+> AI agents don't get frustrated by repetition. When code fails type checking or tests, the agent simply tries again. ([aihero.dev](https://www.aihero.dev/essential-ai-coding-feedback-loops-for-type-script-projects))
 
 Ono što se ljudima čini restriktivnim postaje feature za autonomne sisteme. Agent ne gubi strpljenje, ne uzvraća, i pretvara svaki neuspeh u sledeći prompt za sebe. Friction koji usporava čoveka postaje signal za agenta.
 
-## Samokorektivni workflow
+## The self-correcting workflow
 
 Kada se pre-commit hook-ovi postave, workflow se sam restrukturiše:
 
 ```text
-napiši kod
+write code
     ↓
-pokušaj commit
+attempt commit
     ↓
-automatska validacija se izvršava
+automatic validation runs
     ↓
-neuspeh detektovan
+failure detected
     ↓
-feedback vraćen AI-ju
+feedback returned to AI
     ↓
-AI popravlja problem
+AI fixes the issue
     ↓
-validacija se ponovo pokreće
+validation re-runs
 ```
 
-Ovo je deterministička feedback petlja. Repozitorijum uči agenta kako prihvatljiv kod izgleda — ne tako što mu se kaže, već tako što odbija da prihvati bilo šta drugo.
+Ovo je deterministička feedback petlja. Repository uči agenta kako prihvatljiv kod izgleda — ne tako što mu se kaže, već tako što odbija da prihvati bilo šta drugo.
 
-## Tooling stack
+## The tooling stack
 
 Za JavaScript/TypeScript projekte, tri alata se kombinuju čisto:
 
 | Alat | Uloga |
 |------|-------|
 | **Husky** | Upravlja git hook-ovima unutar projekta (da su versionirani i deljeni, ne samo lokalni). |
-| **lint-staged** | Pokreće validatore samo na fajlovima koji su zapravo staged — drži hook brzim. |
+| **lint-staged** | Pokreće validator-e samo na fajlovima koji su zapravo staged — drži hook brzim. |
 | **Prettier** | Automatski nameće formatting pre nego što se kod commit-uje. |
 
 Zajedno, ovi alati ne *dokumentuju* samo inženjerske standarde — aktivno ih nameću.
 
-## Tipičan validacioni pipeline
+## Typical validation pipeline
 
 Uobičajen pre-commit setup izgleda ovako:
 
@@ -96,23 +96,23 @@ Ovo na svakom commit-u garantuje:
 
 Ako bilo koji korak padne, commit je blokiran. Agent dobija output greške i pokušava ponovo.
 
-## Repozitorijum postaje aktivan sistem
+## The repository becomes an active system
 
-Jedan od važnijih arhitektonskih pomaka u AI-asistiranom inženjeringu je shvatanje da repozitorijum sam treba **aktivno da učestvuje u kontroli kvaliteta**.
+Jedan od važnijih arhitektonskih pomaka u AI-asistiranom inženjeringu je shvatanje da repository sam treba **aktivno da učestvuje u kontroli kvaliteta**.
 
-Tradicionalni repozitorijumi su bili pasivni. Konvencije su živele u dokumentaciji, u code review komentarima, u glavama senior inženjera. Sprovođenje je zavisilo od discipline.
+Tradicionalni repository-ji su bili pasivni. Konvencije su živele u dokumentaciji, u code review komentarima, u glavama senior inženjera. Sprovođenje je zavisilo od discipline.
 
-Moderni AI workflow-i se kreću ka repozitorijumima koji su:
+Moderni AI workflow-i se kreću ka repository-ima koji su:
 
-- **Samo-validirajući** — provere se izvršavaju automatski na svakoj izmeni
-- **Samo-nametljivi** — loše izmene ne mogu da prođu
-- **Otporni na entropy** — kvalitet je strukturni, ne aspiracioni
+- **Self-validating** — provere se izvršavaju automatski na svakoj izmeni
+- **Self-enforcing** — loše izmene ne mogu da prođu
+- **Entropy-resistant** — kvalitet je strukturni, ne aspiracioni
 
 Sam sistem postaje deo inženjerskog procesa.
 
-## Infrastruktura je važnija od prompt-ova
+## Infrastructure matters more than prompts
 
-Dosledna lekcija kroz AI coding workflow-e: **kvalitet AI-ja manje zavisi od sofisticiranosti prompt-a, a više od inženjerske infrastrukture.**
+Dosledna lekcija kroz AI coding workflow-e: **AI quality depends less on prompting sophistication and more on engineering infrastructure.**
 
 Snažna AI coding okruženja obično sadrže:
 
@@ -124,30 +124,30 @@ Snažna AI coding okruženja obično sadrže:
 - Modularnu arhitekturu
 - Kratke feedback cikluse
 
-Ovi sistemi kontinuirano vode i ograničavaju agenta ka izlazu višeg kvaliteta. Bez njih, AI jednostavno ubrzava entropy. (Vidite [Kvalitet softvera u AI eri](/sr/docs/ai-coding/software-quality-in-the-ai-era) za razlog.)
+Ovi sistemi kontinuirano vode i ograničavaju agenta ka izlazu višeg kvaliteta. Bez njih, AI jednostavno ubrzava entropy. (Vidite [Software Quality in the AI Era](/sr/docs/ai-coding/software-quality-in-the-ai-era) za razlog.)
 
-## Veći pomak
+## The bigger shift
 
 Industrija se pomera od:
 
 ```text
-ljudi ručno održavaju kvalitet
+humans manually maintaining quality
 ```
 
 ka:
 
 ```text
-automatizovani sistemi kontinuirano nameću kvalitet
+automated systems continuously enforcing quality
 ```
 
 U toj budućnosti:
 
-- **Ljudi** dizajniraju sisteme
-- **Infrastruktura** definiše pravila
-- **AI agenti** rade unutar tih ograničenja
+- **Humans** dizajniraju sisteme
+- **Infrastructure** definiše pravila
+- **AI agents** rade unutar tih ograničenja
 
-Cilj više nije generisanje koda brže. Cilj je graditi okruženja gde je **kod niskog kvaliteta teško proizvesti**, feedback je trenutan, a i ljudi i AI po default-u konvergiraju ka održivim sistemima.
+Cilj više nije generisanje koda brže. Cilj je graditi okruženja gde je **low-quality code becomes difficult to produce**, feedback je trenutan, a i ljudi i AI po default-u konvergiraju ka održivim sistemima.
 
 ---
 
-Pogledajte i: [Feedback Loops](/sr/docs/ai-coding/feedback-loops) za sloj ohrabrenja na koji se ovo nadograđuje, i [Kvalitet softvera u AI eri](/sr/docs/ai-coding/software-quality-in-the-ai-era) zašto je ovo važnije u AI-asistiranim okruženjima.
+Pogledajte i: [Feedback Loops](/sr/docs/ai-coding/feedback-loops) za sloj ohrabrenja na koji se ovo nadograđuje, i [Software Quality in the AI Era](/sr/docs/ai-coding/software-quality-in-the-ai-era) zašto je ovo važnije u AI-asistiranim okruženjima.

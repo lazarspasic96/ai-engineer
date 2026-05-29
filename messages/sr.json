@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "docs": "Dokumentacija",
+    "github": "GitHub",
+    "toggleMenu": "Otvori meni",
+    "navigation": "Navigacija"
+  },
+  "breadcrumbs": {
+    "root": "Dokumentacija"
+  },
+  "pager": {
+    "previous": "Prethodno",
+    "next": "Sledeće"
+  },
+  "edit": {
+    "editOnGitHub": "Izmeni stranicu na GitHub-u"
+  },
+  "search": {
+    "placeholder": "Pretraži dokumentaciju...",
+    "noResults": "Nema rezultata.",
+    "trigger": "Pretraga"
+  },
+  "language": {
+    "switcherLabel": "Jezik",
+    "en": "English",
+    "sr": "Srpski"
+  },
+  "site": {
+    "tagline": "Učite AI inženjering od osnova"
+  }
+}

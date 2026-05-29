@@ -1,7 +1,13 @@
 import { buildSearchIndex } from '@/lib/search';
 import { SearchDialog } from '@/components/search/search-dialog';
 
-export function SearchProvider() {
-  const entries = buildSearchIndex();
-  return <SearchDialog entries={entries} />;
+import type { Locale } from '@/i18n/routing';
+
+interface SearchProviderProps {
+  locale: Locale;
+}
+
+export function SearchProvider({ locale }: SearchProviderProps) {
+  const entries = buildSearchIndex(locale);
+  return <SearchDialog entries={entries} locale={locale} />;
 }

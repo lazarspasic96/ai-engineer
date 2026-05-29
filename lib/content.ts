@@ -2,7 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-const CONTENT_DIR = path.join(process.cwd(), 'content/docs');
+import type { Locale } from '@/i18n/routing';
+
+const CONTENT_ROOT = path.join(process.cwd(), 'content/docs');
+
+const DEFAULT_LOCALE: Locale = 'en';
 
 export interface DocMeta {
   title: string;
@@ -23,6 +27,7 @@ export interface NavSection {
   items: NavItem[];
 }
 
+// Section labels stay in English across all locales by design.
 const SECTION_ORDER: Record<string, { title: string; order: number }> = {
   'getting-started': { title: 'Getting Started', order: 1 },
   fundamentals: { title: 'Fundamentals', order: 2 },
@@ -31,12 +36,18 @@ const SECTION_ORDER: Record<string, { title: string; order: number }> = {
   'ai-coding': { title: 'AI Coding', order: 5 },
 };
 
-export function getAllDocSlugs(): string[][] {
+function localeDir(locale: Locale): string {
+  return path.join(CONTENT_ROOT, locale);
+}
+
+export function getAllDocSlugs(locale: Locale = DEFAULT_LOCALE): string[][] {
   const slugs: string[][] = [];
-  const sections = fs.readdirSync(CONTENT_DIR);
+  const root = localeDir(locale);
+  if (!fs.existsSync(root)) return slugs;
+  const sections = fs.readdirSync(root);
 
   for (const section of sections) {
-    const sectionPath = path.join(CONTENT_DIR, section);
+    const sectionPath = path.join(root, section);
     if (!fs.statSync(sectionPath).isDirectory()) continue;
 
     const files = fs.readdirSync(sectionPath);
@@ -49,19 +60,21 @@ export function getAllDocSlugs(): string[][] {
   return slugs;
 }
 
-export function getDocFrontmatter(slug: string[]): DocMeta {
-  const filePath = path.join(CONTENT_DIR, ...slug) + '.mdx';
+export function getDocFrontmatter(slug: string[], locale: Locale = DEFAULT_LOCALE): DocMeta {
+  const filePath = path.join(localeDir(locale), ...slug) + '.mdx';
   const source = fs.readFileSync(filePath, 'utf-8');
   const { data } = matter(source);
   return data as DocMeta;
 }
 
-export function getNavigation(): NavSection[] {
+export function getNavigation(locale: Locale = DEFAULT_LOCALE): NavSection[] {
   const sections: NavSection[] = [];
-  const dirs = fs.readdirSync(CONTENT_DIR);
+  const root = localeDir(locale);
+  if (!fs.existsSync(root)) return sections;
+  const dirs = fs.readdirSync(root);
 
   for (const dir of dirs) {
-    const dirPath = path.join(CONTENT_DIR, dir);
+    const dirPath = path.join(root, dir);
     if (!fs.statSync(dirPath).isDirectory()) continue;
 
     const sectionConfig = SECTION_ORDER[dir];
@@ -73,7 +86,7 @@ export function getNavigation(): NavSection[] {
     for (const file of files) {
       if (!file.endsWith('.mdx')) continue;
       const slug = [dir, file.replace('.mdx', '')];
-      const meta = getDocFrontmatter(slug);
+      const meta = getDocFrontmatter(slug, locale);
       items.push({
         title: meta.title,
         slug,
@@ -101,8 +114,8 @@ export interface FlatNavItem {
   section: string;
 }
 
-export function getFlatNavigation(): FlatNavItem[] {
-  const sections = getNavigation();
+export function getFlatNavigation(locale: Locale = DEFAULT_LOCALE): FlatNavItem[] {
+  const sections = getNavigation(locale);
   const flat: FlatNavItem[] = [];
 
   for (const section of sections) {
@@ -118,8 +131,8 @@ export function getFlatNavigation(): FlatNavItem[] {
   return flat;
 }
 
-export function getDocContent(slug: string[]): string {
-  const filePath = path.join(CONTENT_DIR, ...slug) + '.mdx';
+export function getDocContent(slug: string[], locale: Locale = DEFAULT_LOCALE): string {
+  const filePath = path.join(localeDir(locale), ...slug) + '.mdx';
   const source = fs.readFileSync(filePath, 'utf-8');
   const { content } = matter(source);
   return content;

@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "docs": "Docs",
+    "github": "GitHub",
+    "toggleMenu": "Toggle menu",
+    "navigation": "Navigation"
+  },
+  "breadcrumbs": {
+    "root": "Docs"
+  },
+  "pager": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "edit": {
+    "editOnGitHub": "Edit this page on GitHub"
+  },
+  "search": {
+    "placeholder": "Search docs...",
+    "noResults": "No results found.",
+    "trigger": "Search"
+  },
+  "language": {
+    "switcherLabel": "Language",
+    "en": "English",
+    "sr": "Srpski"
+  },
+  "site": {
+    "tagline": "Learn AI engineering from the ground up"
+  }
+}

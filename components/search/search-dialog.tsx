@@ -3,19 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, Search } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { useTranslations } from 'next-intl';
+
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { docHref } from '@/lib/locale-path';
+
+import type { Locale } from '@/i18n/routing';
 import type { SearchEntry } from '@/lib/search';
 
 interface SearchDialogProps {
   entries: SearchEntry[];
+  locale: Locale;
 }
 
-export function SearchDialog({ entries }: SearchDialogProps) {
+export function SearchDialog({ entries, locale }: SearchDialogProps) {
   const router = useRouter();
+  const t = useTranslations('search');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchEntry[]>([]);
@@ -40,7 +43,6 @@ export function SearchDialog({ entries }: SearchDialogProps) {
       setQuery('');
       setResults([]);
       setActiveIndex(0);
-      // Small delay to ensure dialog is rendered
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
@@ -78,9 +80,9 @@ export function SearchDialog({ entries }: SearchDialogProps) {
   const navigate = useCallback(
     (entry: SearchEntry) => {
       setOpen(false);
-      router.push(`/docs/${entry.slug.join('/')}`);
+      router.push(docHref(locale, entry.slug));
     },
-    [router],
+    [router, locale],
   );
 
   const onKeyDown = useCallback(
@@ -90,9 +92,7 @@ export function SearchDialog({ entries }: SearchDialogProps) {
         setActiveIndex((i) => (i + 1) % Math.max(results.length, 1));
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setActiveIndex(
-          (i) => (i - 1 + results.length) % Math.max(results.length, 1),
-        );
+        setActiveIndex((i) => (i - 1 + results.length) % Math.max(results.length, 1));
       } else if (e.key === 'Enter' && results[activeIndex]) {
         e.preventDefault();
         navigate(results[activeIndex]);
@@ -108,7 +108,7 @@ export function SearchDialog({ entries }: SearchDialogProps) {
         className="border-input bg-muted/40 text-muted-foreground hover:bg-muted flex h-9 items-center gap-2 rounded-md border px-3 text-sm transition-colors md:w-60"
       >
         <Search className="h-3.5 w-3.5" />
-        <span className="hidden md:inline">Search docs...</span>
+        <span className="hidden md:inline">{t('placeholder')}</span>
         <kbd className="bg-background border-border pointer-events-none ml-auto hidden rounded border px-1.5 py-0.5 text-[10px] font-medium md:inline">
           ⌘K
         </kbd>
@@ -116,7 +116,7 @@ export function SearchDialog({ entries }: SearchDialogProps) {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-lg">
-          <DialogTitle className="sr-only">Search documentation</DialogTitle>
+          <DialogTitle className="sr-only">{t('trigger')}</DialogTitle>
           <div className="border-border flex items-center gap-2 border-b px-4">
             <Search className="text-muted-foreground h-4 w-4 shrink-0" />
             <input
@@ -124,7 +124,7 @@ export function SearchDialog({ entries }: SearchDialogProps) {
               value={query}
               onChange={(e) => search(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Search documentation..."
+              placeholder={t('placeholder')}
               className="placeholder:text-muted-foreground h-12 w-full bg-transparent text-sm outline-none"
             />
           </div>
@@ -141,9 +141,7 @@ export function SearchDialog({ entries }: SearchDialogProps) {
                   >
                     <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
                     <div className="min-w-0">
-                      <div className="truncate font-medium">
-                        {entry.title}
-                      </div>
+                      <div className="truncate font-medium">{entry.title}</div>
                       <div className="text-muted-foreground truncate text-xs">
                         {entry.section}
                       </div>
@@ -156,13 +154,13 @@ export function SearchDialog({ entries }: SearchDialogProps) {
 
           {query && results.length === 0 && (
             <div className="text-muted-foreground p-8 text-center text-sm">
-              No results found for &ldquo;{query}&rdquo;
+              {t('noResults')}
             </div>
           )}
 
           {!query && (
             <div className="text-muted-foreground p-8 text-center text-sm">
-              Type to search documentation
+              {t('placeholder')}
             </div>
           )}
         </DialogContent>

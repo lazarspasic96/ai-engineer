@@ -1,4 +1,5 @@
 import createMDX from '@next/mdx';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 import type { NextConfig } from 'next';
 
@@ -13,11 +14,10 @@ const withMDX = createMDX({
       'remark-frontmatter',
       ['remark-mdx-frontmatter', { name: 'metadata' }],
     ],
-    rehypePlugins: [
-      'rehype-slug',
-      ['rehype-autolink-headings', { behavior: 'wrap' }],
-    ],
+    rehypePlugins: ['rehype-slug', ['rehype-autolink-headings', { behavior: 'wrap' }]],
   },
 });
 
-export default withMDX(nextConfig);
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
+export default withNextIntl(withMDX(nextConfig));

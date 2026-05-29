@@ -1,20 +1,27 @@
 import { getAllDocSlugs } from '@/lib/content';
+import { docHref, rootHref } from '@/lib/locale-path';
+import { routing } from '@/i18n/routing';
 
 import type { MetadataRoute } from 'next';
 
+const BASE_URL = 'https://ai-engineer.sh';
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://ai-engineer.sh';
+  const entries: MetadataRoute.Sitemap = [];
 
-  const docPages = getAllDocSlugs().map((slug) => ({
-    url: `${baseUrl}/docs/${slug.join('/')}`,
-    lastModified: new Date(),
-  }));
-
-  return [
-    {
-      url: baseUrl,
+  for (const locale of routing.locales) {
+    entries.push({
+      url: `${BASE_URL}${rootHref(locale)}`,
       lastModified: new Date(),
-    },
-    ...docPages,
-  ];
+    });
+
+    for (const slug of getAllDocSlugs(locale)) {
+      entries.push({
+        url: `${BASE_URL}${docHref(locale, slug)}`,
+        lastModified: new Date(),
+      });
+    }
+  }
+
+  return entries;
 }

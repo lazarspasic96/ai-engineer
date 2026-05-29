@@ -1,14 +1,21 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
+
 import { getFlatNavigation } from '@/lib/content';
+import { docsRoot } from '@/lib/locale-path';
+
+import type { Locale } from '@/i18n/routing';
 
 interface DocBreadcrumbsProps {
   slug: string[];
+  locale: Locale;
 }
 
-export function DocBreadcrumbs({ slug }: DocBreadcrumbsProps) {
-  const flat = getFlatNavigation();
+export async function DocBreadcrumbs({ slug, locale }: DocBreadcrumbsProps) {
+  const flat = getFlatNavigation(locale);
   const current = flat.find((item) => item.slug[0] === slug[0] && item.slug[1] === slug[1]);
+  const t = await getTranslations({ locale, namespace: 'breadcrumbs' });
 
   if (!current) return null;
 
@@ -17,11 +24,8 @@ export function DocBreadcrumbs({ slug }: DocBreadcrumbsProps) {
       aria-label="Breadcrumb"
       className="text-muted-foreground mb-4 flex items-center gap-1.5 text-sm"
     >
-      <Link
-        href="/docs/getting-started/introduction"
-        className="hover:text-foreground transition-colors"
-      >
-        Docs
+      <Link href={docsRoot(locale)} className="hover:text-foreground transition-colors">
+        {t('root')}
       </Link>
       <ChevronRight className="h-3.5 w-3.5" />
       <span>{current.section}</span>

@@ -1,5 +1,11 @@
-import { getAllDocSlugs, getDocFrontmatter, getDocContent } from '@/lib/content';
-import { getFlatNavigation } from '@/lib/content';
+import {
+  getAllDocSlugs,
+  getDocFrontmatter,
+  getDocContent,
+  getFlatNavigation,
+} from '@/lib/content';
+
+import type { Locale } from '@/i18n/routing';
 
 export interface SearchEntry {
   id: string;
@@ -32,14 +38,14 @@ function stripMdx(raw: string): string {
   );
 }
 
-export function buildSearchIndex(): SearchEntry[] {
-  const flatNav = getFlatNavigation();
-  const slugs = getAllDocSlugs();
+export function buildSearchIndex(locale: Locale = 'en'): SearchEntry[] {
+  const flatNav = getFlatNavigation(locale);
+  const slugs = getAllDocSlugs(locale);
   const entries: SearchEntry[] = [];
 
   for (const slug of slugs) {
-    const meta = getDocFrontmatter(slug);
-    const rawContent = getDocContent(slug);
+    const meta = getDocFrontmatter(slug, locale);
+    const rawContent = getDocContent(slug, locale);
     const navItem = flatNav.find(
       (item) => item.slug[0] === slug[0] && item.slug[1] === slug[1],
     );
